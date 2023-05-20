@@ -1,9 +1,9 @@
 from tkinter import *
-from KeyGen import KeyGenerator
+from KeyGenUI import KeyGeneratorWindow
 
 #Funkcije buttona (Odvajacemo logiku od izgleda)
 def KeyGen():
-    KeyGenerator()
+    KeyGeneratorWindow()
 
 def ListKeys():
     print("List of Keys -  not yet implemented")
