@@ -85,7 +85,7 @@ def GeneratingPublicAndPrivateKeys():
     publicKey = PublicKey(q, g, h)
     privateKey = PrivateKey(key, q)
 
-    return publicKey, privateKey
+    return privateKey, publicKey
 
 
 
@@ -158,7 +158,7 @@ def main():
     msg = 'encryption'
     print("Original Message :", msg)
 
-    public, private = GeneratingPublicAndPrivateKeys()
+    private, public = GeneratingPublicAndPrivateKeys()
 
     public.importKey(public.exportKey()); print(); print();print()
     private.importKey("Kurcina", private.exportKey("Kurcina"))

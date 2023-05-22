@@ -2,6 +2,7 @@ import hashlib
 from Crypto.PublicKey import RSA
 from Crypto.PublicKey import DSA
 from Hashing_and_Truncating import *
+from ElGamalImpl import *
 
 dictionaryOfPrivateKeyRings = {}
 
@@ -16,9 +17,10 @@ class PrivateKeyRing:
         self.publicKeyId = publicKey[-8:]
 
 
-    def export1(self):
+    def export1(self, filename):
+
         print()
-    def import1(self):
+    def import1(self, filename):
         print()
 
 '''class PublicKeyRing:
@@ -48,7 +50,6 @@ def GenerateRsaKey(name, email, password):
     privateKey = key.export_key(passphrase=hashedPassphrase)
     publicKey = key.public_key().export_key()
 
-
     #Pravimo objekat
     keyRing = PrivateKeyRing(email, name , hashedPassphrase, "Rsa", privateKey, publicKey)
 
@@ -60,7 +61,22 @@ def GenerateRsaKey(name, email, password):
 
 
 def GenerateElGamalKey(name, email, password):
-    print("not implemented")
+    privateKey, publicKey = GeneratingPublicAndPrivateKeys()
+
+    # Hashujemo passphrase sa SHA1
+    hashedPassphrase = sha1_hash(password)
+
+    privateKeyExport = privateKey.exportKey(hashedPassphrase)
+    publicKeyExport = publicKey.exportKey()
+
+    # Pravimo objekat
+    keyRing = PrivateKeyRing(email, name, hashedPassphrase, "ElGamal", privateKeyExport, publicKeyExport)
+
+    if not dictionaryOfPrivateKeyRings.__contains__(keyRing.userId):
+        dictionaryOfPrivateKeyRings[keyRing.userId] = []
+        dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
+    else:
+        dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
 
 
 def GenerateDsaKey(name, email, password):
