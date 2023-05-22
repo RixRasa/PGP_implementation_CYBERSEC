@@ -1,9 +1,7 @@
 import hashlib
-import rsa
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import CAST
 from Crypto.PublicKey import DSA
-from ElGamalImpl import *
+from Hashing_and_Truncating import *
 
 dictionaryOfPrivateKeyRings = {}
 
@@ -40,7 +38,6 @@ def GeneratingKey(name, email, password, algorithm):
         GenerateElGamalKey(name, email, password)
 
 
-
 def GenerateRsaKey(name, email, password):
     key = RSA.generate(2048)
 
@@ -62,24 +59,9 @@ def GenerateRsaKey(name, email, password):
         dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
 
 
-    '''#Ovde sifrujemo privateKey , Cast128 algoritmom uz pomoc hashovanog Passphrase-a kao kljuca
-            cipher = CAST.new(hashedPassphrase, CAST.MODE_OPENPGP)
-            privateKeyEncripted = cipher.encrypt(privateKey)'''
-    '''
-    #Ovde desifrujemo privaeKeyEncripted samo radi provere
-    eiv = privateKeyEncripted[:CAST.block_size + 2] #blok koji iz nekog razloga mora da postoji
-    ciphertext = privateKeyEncripted[CAST.block_size + 2:] #nasa poruka koja ide iza 'eiv' bloka 
-    cipher = CAST.new(hashedPassphrase, CAST.MODE_OPENPGP, eiv)
-    privateKeyDecrypted = cipher.decrypt(ciphertext)
-    '''
-
-
 def GenerateElGamalKey(name, email, password):
-    q = random.randint(pow(10, 20), pow(10, 50))
-    g = random.randint(2, q)
+    print("not implemented")
 
-    key = gen_key(q)  # Private key for receiver
-    h = power(g, key, q)
 
 def GenerateDsaKey(name, email, password):
     key = DSA.generate(2048)
@@ -102,27 +84,6 @@ def GenerateDsaKey(name, email, password):
 
 
 
-def sha1_hash(message):
-    # Create a SHA-1 hash object
-    sha1 = hashlib.sha1()
 
-    # Convert the message to bytes and update the hash object
-    sha1.update(message.encode('utf-8'))
-
-    # Get the hexadecimal representation of the hash
-    hashed_message = sha1.hexdigest()
-
-    return hashed_message
-
-
-'''def truncate_hash(hash_value, desired_length):
-    # Convert the hash value to bytes
-    hash_bytes = bytes.fromhex(hash_value)
-
-    # Truncate the hash value to the desired length
-    truncated_bytes = hash_bytes[:desired_length // 8]
-
-    # Convert the truncated bytes back to a hexadecimal string
-    return truncated_bytes'''
 
 

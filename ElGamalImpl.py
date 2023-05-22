@@ -1,9 +1,95 @@
 import random
 from math import pow
+import base64
+from Crypto.Cipher import CAST
+from Hashing_and_Truncating import *
 
-a = random.randint(2, 10)
 
 
+#|||||||||||||||||||||||||||||||||||||||||||||||PUBLIC AND PRIVATE KEY CLASSES||||||||||||||||||||||||||||||||||||||||||||||
+class PublicKey():
+    def __init__(self, q, g, h):
+        self.q = q
+        self.g = g
+        self.h = h
+
+    def exportKey(self):
+        print(self.q);print(self.g);print(self.h) #samo za testiranje
+
+        string = str(self.q) + "/" + str(self.g) + "/" + str(self.h) #Formiranje stringa od atributa objekta kljuca
+
+        stringBytes = string.encode('utf-8') #Prebacivanje iz stringa u bytes
+
+        stringBytesEcode64 = b'-----BEGIN ELGAMAL PUBLIC KEY-----\n' +  base64.b64encode(stringBytes) + b'\n' + b'-----END ELGAMAL PUBLIC KEY-----' #Dodavanje zaglavlja i encodovanje u 'pem'
+
+        return stringBytesEcode64
+
+    def importKey(self, stringBytesEcode64):
+        stringBytesEcode64 = stringBytesEcode64[35: -33] #Skidanje zaglavlja
+
+        stringBytes = base64.b64decode(stringBytesEcode64) #Deckodovanje iz 'pem' formata
+
+        string = stringBytes.decode('utf-8') #Prebacivanje iz bytes u string
+
+        q,g,h = string.split('/') #Splitovanje stringa i ubacivanje vrednosti
+        print(q); print(g); print(h)# samo za testiranje
+
+
+class PrivateKey():
+    def __init__(self, key, q):
+        self.key = key
+        self.q = q
+
+    def exportKey(self, passphrase):
+        print(self.key); print(self.q)#samo za testiranje
+
+        string = str(self.key) + "/" + str(self.q) #Formiranje stringa od atributa objekta kljuca
+
+        stringBytes = string.encode('utf-8') #Prebacivanje iz stringa u bytes
+
+        hashedPassphrase = truncate_hash(sha1_hash(passphrase), 128) #Hashiramo sifru koju cemo koristiti kao kljuc za enkripciju privatnog kljuca
+
+        cipher = CAST.new(hashedPassphrase, CAST.MODE_OPENPGP) #Enkriptujemo privatni kljuc('stringBytes') pomocu kljuca('hashedPassphrase')
+        privateKeyEncripted = cipher.encrypt(stringBytes)
+
+        stringBytesEcode64 =b'-----BEGIN ELGAMAL PRIVATE KEY-----\n' +  base64.b64encode(privateKeyEncripted) + b'\n' + b'-----END ELGAMAL PRIVATE KEY-----' #Dodajemo zaglavlje i encodujemo u 'pem'
+
+        return stringBytesEcode64
+
+    def importKey(self, passphrase, stringBytesEcode64):
+        hashedPassphrase = truncate_hash(sha1_hash(passphrase), 128)#Hashirsamo sifru
+
+        privateKeyEncripted = base64.b64decode(stringBytesEcode64[36:-34])#Skidamo zaglavlje i decodujemo iz 'pem-a'
+
+        eiv = privateKeyEncripted[:CAST.block_size + 2]  #Desifrujemo i dobijamo ponovo privatni kljuc u formi 'bytes' ('stringBytes')
+        ciphertext = privateKeyEncripted[CAST.block_size + 2:]
+        cipher = CAST.new(hashedPassphrase, CAST.MODE_OPENPGP, eiv)
+        stringBytes = cipher.decrypt(ciphertext)
+
+        string = stringBytes.decode('utf-8') #Prebacivanje iz bytes u string
+
+        key, q = string.split('/') #Splitovanje stringa i ubacivanje vrednosti
+
+        print(key); print(q)# samo za testiranje
+
+
+
+#||||||||||||||||||||||||||||||||||||||||||||||GENERATING KEYS||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+def GeneratingPublicAndPrivateKeys():
+    q = random.randint(pow(10, 20), pow(10, 50))
+    g = random.randint(2, q)
+
+    key = gen_key(q)  # Private key for receiver
+    h = power(g, key, q)
+
+    publicKey = PublicKey(q, g, h)
+    privateKey = PrivateKey(key, q)
+
+    return publicKey, privateKey
+
+
+
+#|||||||||||||||||||||||||||||||||||||||||HELPER FUNKCIONS FOR ELGAMAL|||||||||||||||||||||||||||||||||||||||||||||||||||||
 def gcd(a, b):
     if a < b:
         return gcd(b, a)
@@ -36,8 +122,11 @@ def power(a, b, c):
     return x % c
 
 
-# Asymmetric encryption
-def encrypt(msg, q, h, g):
+
+#||||||||||||||||||||||||||||||||||||||||||||ENKRIPCIJA I DEKRIPCIJA||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+def encrypt(msg, publicKey):
+    h = publicKey.h; q = publicKey.q; g = publicKey.g
+
     en_msg = []
 
     k = gen_key(q)  # Private key for sender
@@ -47,15 +136,15 @@ def encrypt(msg, q, h, g):
     for i in range(0, len(msg)):
         en_msg.append(msg[i])
 
-    print("g^k used : ", p)
-    print("g^ak used : ", s)
     for i in range(0, len(en_msg)):
         en_msg[i] = s * ord(en_msg[i])
 
     return en_msg, p
 
 
-def decrypt(en_msg, p, key, q):
+def decrypt(en_msg, p, privateKey):
+    key = privateKey.key; q = privateKey.q
+
     dr_msg = []
     h = power(p, key, q)
     for i in range(0, len(en_msg)):
@@ -69,16 +158,13 @@ def main():
     msg = 'encryption'
     print("Original Message :", msg)
 
-    q = random.randint(pow(10, 20), pow(10, 50))
-    g = random.randint(2, q)
+    public, private = GeneratingPublicAndPrivateKeys()
 
-    key = gen_key(q)  # Private key for receiver
-    h = power(g, key, q)
-    print("g used : ", g)
-    print("g^a used : ", h)
+    public.importKey(public.exportKey()); print(); print();print()
+    private.importKey("Kurcina", private.exportKey("Kurcina"))
 
-    en_msg, p = encrypt(msg, q, h, g)
-    dr_msg = decrypt(en_msg, p, key, q)
+
+    en_msg, p = encrypt(msg, public)
+    dr_msg = decrypt(en_msg, p, private)
     dmsg = ''.join(dr_msg)
-    print("Decrypted Message :", dmsg);
-
+    print("Decrypted Message :", dmsg)
