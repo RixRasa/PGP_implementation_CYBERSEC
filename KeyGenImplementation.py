@@ -21,8 +21,9 @@ class PrivateKeyRing:
     def import1(self, filename):
         print()
 
-dictionaryOfPrivateKeyRings = {"ilija@gmail.comilija":[PrivateKeyRing("ilija@gmail.com","Ilija","be77e3d34969ee11d2789f625efac759","Rsa","123","***")
-                                       ,PrivateKeyRing("lizard123400@gmail.com","Ilija","be77e3d34969ee11d2789f625efac759","Rsa","456","***")]}
+#dictionaryOfPrivateKeyRings = {"ilija@gmail.comilija":[PrivateKeyRing("ilija@gmail.com","Ilija","be77e3d34969ee11d2789f625efac759","Rsa","123","***")
+#                                       ,PrivateKeyRing("lizard123400@gmail.com","Ilija","be77e3d34969ee11d2789f625efac759","Rsa","456","***")]}
+dictionaryOfPrivateKeyRings = {}
 '''class PublicKeyRing:
     def __init__(self, email, name, password, algorithm, publicKey, privateKey):
         self.userId = email + name
@@ -33,22 +34,22 @@ dictionaryOfPrivateKeyRings = {"ilija@gmail.comilija":[PrivateKeyRing("ilija@gma
 
 
 def GeneratingKey(name, email, password, algorithm):
-    if(algorithm == 1):
+    if(algorithm == 1):# RSA
         GenerateRsaKey(name, email, password)
-    if(algorithm == 2):
+    if(algorithm == 2):# ElGamal & DSA
         GenerateDsaKey(name, email, password)
         GenerateElGamalKey(name, email, password)
 
 
 
 def GenerateRsaKey(name, email, password):
-    key = RSA.generate(2048)
+    key = RSA.generate(2048) #Dobijamo OBJEKAT RsaKey
 
     # Hashujemo passphrase sa SHA1
     hashedPassphrase = sha1_hash(password)
 
     #Pretvaramo kljuceve iz RsaKey objekta u bytes
-    privateKey = key.export_key('PEM',passphrase=hashedPassphrase)
+    privateKey = key.export_key(passphrase=hashedPassphrase) #eksportujemo u byte string formata 'PEM'
     publicKey = key.public_key().export_key()
 
     #Pravimo objekat
@@ -62,13 +63,14 @@ def GenerateRsaKey(name, email, password):
 
 
 
+
 def GenerateElGamalKey(name, email, password):
     privateKey, publicKey = GeneratingPublicAndPrivateKeys()
 
     # Hashujemo passphrase sa SHA1
     hashedPassphrase = sha1_hash(password)
 
-    privateKeyExport = privateKey.export_key(hashedPassphrase)
+    privateKeyExport = privateKey.export_key(hashedPassphrase)#eksportujemo u byte string formata 'PEM'
     publicKeyExport = publicKey.export_key()
 
     # Pravimo objekat

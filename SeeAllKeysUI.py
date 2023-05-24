@@ -59,7 +59,7 @@ def showAllKeysWindow(name,email):
 
 
 
-        showAllKeysWindow=Tk()
+        showAllKeysWindow=Toplevel()
         showAllKeysWindow.title("All your keys")
         frm=Frame(showAllKeysWindow)
         frm.pack(side=tkinter.LEFT,padx=20)
@@ -100,11 +100,9 @@ def passwordForPrivateKey(keys):
     labelInfo = Label(showPrivateKeysPasswordWindow, text="Enter your password")
     entryPassword = Entry(showPrivateKeysPasswordWindow, width=50)
 
-    hashedPass = truncate_hash(sha1_hash(entryPassword.get()), 128)
-    hex_string = hashedPass.hex()
-    print("Heshirana sifra koju prosledjujem funkciji:"+hex_string)
+
     buttonDone = Button(showPrivateKeysPasswordWindow, text="Done",
-                        command=lambda: showPrivateKeysWindow(keys,truncate_hash(sha1_hash(entryPassword.get()), 128).hex()))
+                        command=lambda: showPrivateKeysWindow(keys,sha1_hash(entryPassword.get())))
 
     # Pozicioniranje
     labelInfo.grid(row=0, column=0, columnspan=2, pady=3, padx=50)
@@ -136,6 +134,15 @@ def showPrivateKeysWindow(keys,sifra):
 
 
         for el in keys:
-            decriptedKey=el.EcryptedPrivateKey+'1'
-            polje = [el.algorithm,decriptedKey]
+            privateKey = 0
+            if(el.algorithm == "Rsa"):
+                privateKey = str(RSA.import_key(el.EcryptedPrivateKey, passphrase= el.hashedPassphrade))
+            elif(el.algorithm == "Dsa"):
+                privateKey = str(DSA.import_key(el.hashedPassphrade, passphrase= el.hashedPassphrade))
+            elif(el.algorithm == "ElGamal"):
+                privateKey = "..."
+
+
+
+            polje = [el.algorithm,privateKey]
             tv.insert('', 'end', values=polje)

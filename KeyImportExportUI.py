@@ -2,12 +2,13 @@ from tkinter import *
 from tkinter.ttk import *
 from tkinter.filedialog import askopenfile, askopenfilename
 import time
-
+from KeyImportExportImplementation import importKey
 
 #Pomocne Funkcije
 def open_file():
     file_path = askopenfilename()
     print(file_path)
+    importKey(file_path)
     if file_path is not None:
         pass
 
@@ -20,7 +21,6 @@ def uploadFiles():
         pb1['value'] += 20
         time.sleep(1)
     pb1.destroy()
-
     Label(keyImportWindow, text='Key Imported Successfully!', foreground='green').grid(row=4, columnspan=3, pady=10)
 
 
