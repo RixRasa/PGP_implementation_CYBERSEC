@@ -1,11 +1,13 @@
 from tkinter import *
 from KeyGenUI import KeyGeneratorWindow
+from SeeAllKeysUI import *
 
 #Funkcije buttona (Odvajacemo logiku od izgleda)
 def KeyGen():
     KeyGeneratorWindow()
 
 def ListKeys():
+    AllKeysWindow()
     print("List of Keys -  not yet implemented")
 
 def SendMsg():

@@ -1,5 +1,7 @@
+import tkinter
 from tkinter import *
-from KeyGenImplementation import GeneratingKey
+from tkinter import ttk
+from KeyGenImplementation import *
 import re
 
 
@@ -75,5 +77,3 @@ def GenerateKey(name, email, password, algorithm):
     else:
         GeneratingKey(name, email, password, algorithm)
 
-
-#stojanovicrasa4@gmail.com

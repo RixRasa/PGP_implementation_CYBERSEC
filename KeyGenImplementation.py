@@ -1,9 +1,6 @@
 import hashlib
-import rsa
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import CAST
-
-dictionaryOfPrivateKeyRings = {}
 
 
 class PrivateKeyRing:
@@ -21,6 +18,8 @@ class PrivateKeyRing:
     def import1(self):
         print()
 
+dictionaryOfPrivateKeyRings = {"ilija@gmail.comilija":[PrivateKeyRing("ilija@gmail.com","Ilija","be77e3d34969ee11d2789f625efac759","Rsa","123","***")
+                                       ,PrivateKeyRing("lizard123400@gmail.com","Ilija","be77e3d34969ee11d2789f625efac759","Rsa","456","***")]}
 '''class PublicKeyRing:
     def __init__(self, email, name, password, algorithm, publicKey, privateKey):
         self.userId = email + name
