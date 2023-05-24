@@ -12,7 +12,7 @@ def KeyGeneratorWindow():
     keyGeneratorInputWindow.title("Key Gen")
 
     #Generisanje widgeta
-    labelInfo = Label(keyGeneratorInputWindow, text ="Enter credentials")
+    labelInfo = Label(keyGeneratorInputWindow, text ="Enter credentials:")
 
     labelName = Label(keyGeneratorInputWindow, text ="Enter name: ", bd = 1, relief="sunken")
     entryName = Entry(keyGeneratorInputWindow, width = 100 )
@@ -31,7 +31,7 @@ def KeyGeneratorWindow():
     labelInfo.grid(row = 0, column=0, columnspan=2, pady = 10)
 
     labelName.grid(row = 1, column=0, columnspan=2, pady = 3)
-    entryName.grid(row = 2, column= 0, columnspan=2, pady = 10)
+    entryName.grid(row = 2, column= 0, columnspan=2, pady = 10, padx = 10)
 
     labelEmail.grid(row=3, column=0, columnspan=2, pady=3)
     entryEmail.grid(row = 4, column= 0, columnspan=2, pady = 10)

@@ -13,8 +13,8 @@ class PublicKey():
         self.g = g
         self.h = h
 
-    def exportKey(self):
-        print(self.q);print(self.g);print(self.h) #samo za testiranje
+    def export_key(self):
+        #print(self.q);print(self.g);print(self.h) #samo za testiranje
 
         string = str(self.q) + "/" + str(self.g) + "/" + str(self.h) #Formiranje stringa od atributa objekta kljuca
 
@@ -24,7 +24,7 @@ class PublicKey():
 
         return stringBytesEcode64
 
-    def importKey(self, stringBytesEcode64):
+    def import_key(self, stringBytesEcode64):
         stringBytesEcode64 = stringBytesEcode64[35: -33] #Skidanje zaglavlja
 
         stringBytes = base64.b64decode(stringBytesEcode64) #Deckodovanje iz 'pem' formata
@@ -40,8 +40,8 @@ class PrivateKey():
         self.key = key
         self.q = q
 
-    def exportKey(self, passphrase):
-        print(self.key); print(self.q)#samo za testiranje
+    def export_key(self, passphrase):
+        #print(self.key); print(self.q)#samo za testiranje
 
         string = str(self.key) + "/" + str(self.q) #Formiranje stringa od atributa objekta kljuca
 
@@ -56,7 +56,7 @@ class PrivateKey():
 
         return stringBytesEcode64
 
-    def importKey(self, passphrase, stringBytesEcode64):
+    def import_key(self, passphrase, stringBytesEcode64):
         hashedPassphrase = truncate_hash(sha1_hash(passphrase), 128)#Hashirsamo sifru
 
         privateKeyEncripted = base64.b64decode(stringBytesEcode64[36:-34])#Skidamo zaglavlje i decodujemo iz 'pem-a'
@@ -160,8 +160,8 @@ def main():
 
     private, public = GeneratingPublicAndPrivateKeys()
 
-    public.importKey(public.exportKey()); print(); print();print()
-    private.importKey("Kurcina", private.exportKey("Kurcina"))
+    public.import_key(public.export_key()); print(); print();print()
+    private.import_key("Kurcina", private.export_key("Kurcina"))
 
 
     en_msg, p = encrypt(msg, public)

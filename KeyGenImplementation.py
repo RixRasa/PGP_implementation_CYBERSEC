@@ -40,6 +40,7 @@ def GeneratingKey(name, email, password, algorithm):
         GenerateElGamalKey(name, email, password)
 
 
+
 def GenerateRsaKey(name, email, password):
     key = RSA.generate(2048)
 
@@ -47,7 +48,7 @@ def GenerateRsaKey(name, email, password):
     hashedPassphrase = sha1_hash(password)
 
     #Pretvaramo kljuceve iz RsaKey objekta u bytes
-    privateKey = key.export_key(passphrase=hashedPassphrase)
+    privateKey = key.export_key('PEM',passphrase=hashedPassphrase)
     publicKey = key.public_key().export_key()
 
     #Pravimo objekat
@@ -60,14 +61,15 @@ def GenerateRsaKey(name, email, password):
         dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
 
 
+
 def GenerateElGamalKey(name, email, password):
     privateKey, publicKey = GeneratingPublicAndPrivateKeys()
 
     # Hashujemo passphrase sa SHA1
     hashedPassphrase = sha1_hash(password)
 
-    privateKeyExport = privateKey.exportKey(hashedPassphrase)
-    publicKeyExport = publicKey.exportKey()
+    privateKeyExport = privateKey.export_key(hashedPassphrase)
+    publicKeyExport = publicKey.export_key()
 
     # Pravimo objekat
     keyRing = PrivateKeyRing(email, name, hashedPassphrase, "ElGamal", privateKeyExport, publicKeyExport)
@@ -77,6 +79,7 @@ def GenerateElGamalKey(name, email, password):
         dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
     else:
         dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
+
 
 
 def GenerateDsaKey(name, email, password):
