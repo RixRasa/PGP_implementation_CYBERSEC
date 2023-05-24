@@ -1,6 +1,8 @@
 import hashlib
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import CAST
+from Crypto.PublicKey import DSA
+from Hashing_and_Truncating import *
+from ElGamalImpl import *
 
 
 class PrivateKeyRing:
@@ -13,9 +15,10 @@ class PrivateKeyRing:
         self.publicKeyId = publicKey[-8:]
 
 
-    def export1(self):
+    def export1(self, filename):
+
         print()
-    def import1(self):
+    def import1(self, filename):
         print()
 
 dictionaryOfPrivateKeyRings = {"ilija@gmail.comilija":[PrivateKeyRing("ilija@gmail.com","Ilija","be77e3d34969ee11d2789f625efac759","Rsa","123","***")
@@ -33,25 +36,23 @@ def GeneratingKey(name, email, password, algorithm):
     if(algorithm == 1):
         GenerateRsaKey(name, email, password)
     if(algorithm == 2):
-        GenerateDsaElGamalKey(name, email, password)
+        GenerateDsaKey(name, email, password)
+        GenerateElGamalKey(name, email, password)
 
 
 
 def GenerateRsaKey(name, email, password):
     key = RSA.generate(2048)
+
+    # Hashujemo passphrase sa SHA1
+    hashedPassphrase = sha1_hash(password)
+
     #Pretvaramo kljuceve iz RsaKey objekta u bytes
-    privateKey = key.export_key()
+    privateKey = key.export_key('PEM',passphrase=hashedPassphrase)
     publicKey = key.public_key().export_key()
 
-    #Hashujemo passphrase sa SHA1
-    hashedPassphrase = truncate_hash(sha1_hash(password), 128)
-
-    #Ovde sifrujemo privateKey , Cast128 algoritmom uz pomoc hashovanog Passphrase-a kao kljuca
-    cipher = CAST.new(hashedPassphrase, CAST.MODE_OPENPGP)
-    privateKeyEncripted = cipher.encrypt(privateKey)
-
     #Pravimo objekat
-    keyRing = PrivateKeyRing(email, name , hashedPassphrase, "Rsa", privateKeyEncripted, publicKey, )
+    keyRing = PrivateKeyRing(email, name , hashedPassphrase, "Rsa", privateKey, publicKey)
 
     if not dictionaryOfPrivateKeyRings.__contains__(keyRing.userId):
         dictionaryOfPrivateKeyRings[keyRing.userId] = []
@@ -60,40 +61,48 @@ def GenerateRsaKey(name, email, password):
         dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
 
 
-    #Ovde desifrujemo privaeKeyEncripted samo radi provere
-    '''eiv = privateKeyEncripted[:CAST.block_size + 2] #blok koji iz nekog razloga mora da postoji
-    ciphertext = privateKeyEncripted[CAST.block_size + 2:] #nasa poruka koja ide iza 'eiv' bloka 
-    cipher = CAST.new(hashedPassphrase, CAST.MODE_OPENPGP, eiv)
-    privateKeyDecrypted = cipher.decrypt(ciphertext)'''
+
+def GenerateElGamalKey(name, email, password):
+    privateKey, publicKey = GeneratingPublicAndPrivateKeys()
+
+    # Hashujemo passphrase sa SHA1
+    hashedPassphrase = sha1_hash(password)
+
+    privateKeyExport = privateKey.export_key(hashedPassphrase)
+    publicKeyExport = publicKey.export_key()
+
+    # Pravimo objekat
+    keyRing = PrivateKeyRing(email, name, hashedPassphrase, "ElGamal", privateKeyExport, publicKeyExport)
+
+    if not dictionaryOfPrivateKeyRings.__contains__(keyRing.userId):
+        dictionaryOfPrivateKeyRings[keyRing.userId] = []
+        dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
+    else:
+        dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
+
+
+
+def GenerateDsaKey(name, email, password):
+    key = DSA.generate(2048)
+
+    # Hashujemo passphrase sa SHA1
+    hashedPassphrase = sha1_hash(password)
+
+    # Pretvaramo kljuceve iz RsaKey objekta u bytes
+    privateKey = key.export_key(passphrase=hashedPassphrase)
+    publicKey = key.public_key().export_key()
+
+    # Pravimo objekat
+    keyRing = PrivateKeyRing(email, name, hashedPassphrase, "Dsa", privateKey, publicKey)
+
+    if not dictionaryOfPrivateKeyRings.__contains__(keyRing.userId):
+        dictionaryOfPrivateKeyRings[keyRing.userId] = []
+        dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
+    else:
+        dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
 
 
 
 
-def GenerateDsaElGamalKey(name, email, passoword):
-    print("nije jos implementirano")
-
-
-def truncate_hash(hash_value, desired_length):
-    # Convert the hash value to bytes
-    hash_bytes = bytes.fromhex(hash_value)
-
-    # Truncate the hash value to the desired length
-    truncated_bytes = hash_bytes[:desired_length // 8]
-
-    # Convert the truncated bytes back to a hexadecimal string
-    return truncated_bytes
-
-
-def sha1_hash(message):
-    # Create a SHA-1 hash object
-    sha1 = hashlib.sha1()
-
-    # Convert the message to bytes and update the hash object
-    sha1.update(message.encode('utf-8'))
-
-    # Get the hexadecimal representation of the hash
-    hashed_message = sha1.hexdigest()
-
-    return hashed_message
 
 
