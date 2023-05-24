@@ -1,6 +1,6 @@
 from tkinter import *
 from KeyGenUI import KeyGeneratorWindow
-from KeyImportExportUI import KeyImportUI
+from KeyImportExportUI import KeyImportUI, KeyExportUI
 #Funkcije buttona (Odvajacemo logiku od izgleda)
 def KeyGen():
     KeyGeneratorWindow()
@@ -15,7 +15,7 @@ def KeyImport():
     KeyImportUI()
 
 def KeyExport():
-    KeyExport()
+    KeyExportUI()
 
 
 global root
