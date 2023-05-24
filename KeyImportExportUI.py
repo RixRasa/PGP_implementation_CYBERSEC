@@ -61,6 +61,7 @@ def KeyImportUI():
 
 
 def KeyExportUI():
+    print("kurac")
     global keyExportWindow
     keyExportWindow = Toplevel()
     keyExportWindow.title("Key Import Window")
@@ -68,3 +69,7 @@ def KeyExportUI():
     labelUpload = Label(keyExportWindow, text='Choose where you will export key')
     buttonChoose = Button(keyExportWindow, text='Choose file location', command=lambda: open_file())
     buttonUpload = Button(keyExportWindow, text='Export Key', command=uploadFiles)
+
+    labelUpload.grid(row=0, column=0, padx=20, pady=25)
+    buttonChoose.grid(row=0, column=1, padx=20, pady=25)
+    buttonUpload.grid(row=1, columnspan=3, pady=10)
