@@ -44,7 +44,6 @@ def GeneratingKey(name, email, password, algorithm):
 
 def GenerateRsaKey(name, email, password):
     key = RSA.generate(2048) #Dobijamo OBJEKAT RsaKey
-
     # Hashujemo passphrase sa SHA1
     hashedPassphrase = sha1_hash(password)
 

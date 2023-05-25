@@ -9,10 +9,6 @@ import re
 
 
 def AllKeysWindow():
-    pas="ilija123"
-    hashedPassphrase = truncate_hash(sha1_hash(pas), 128)
-    hex_string = hashedPassphrase.hex()
-    print(hex_string)
     #print(hashedPassphrase)
     # Novi window
     global allKyesWindow

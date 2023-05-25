@@ -2,7 +2,7 @@ from tkinter import *
 from KeyGenUI import KeyGeneratorWindow
 from SeeAllKeysUI import *
 
-from KeyImportExportUI import KeyImportUI, KeyExportUI
+from KeyImportExportUI import KeyImportUI,CredentialsForExportWindow
 #Funkcije buttona (Odvajacemo logiku od izgleda)
 def KeyGen():
     KeyGeneratorWindow()
@@ -18,7 +18,8 @@ def KeyImport():
     KeyImportUI()
 
 def KeyExport():
-    KeyExportUI()
+    #print("kita")
+    CredentialsForExportWindow()
 
 
 global root
@@ -27,7 +28,7 @@ root.eval('tk::PlaceWindow . center')
 root.title('Cyber Security PGP Project')
 
 #Ovde pravimo widgete i dajemo im atribute
-main_label = Label(root, text = "Choose what do you want to do?", padx = 100 , bd = 1, relief="sunken")
+main_label = Label(root, text = "Choose what do you want to do?", padx = 100 , bd = 1 ,relief="sunken")
 buttonKeyGen = Button(root, text = "Generate new pair of keys" , command=KeyGen)
 buttonImportKey = Button(root, text = "Import Keys" , command=KeyImport)
 buttonExportKey = Button(root, text = "Export Keys" , command=KeyExport)
