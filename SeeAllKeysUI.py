@@ -4,29 +4,30 @@ from tkinter import ttk
 from KeyGenImplementation import *
 from ElGamalImpl import PrivateKey
 import re
+from tkinter import Toplevel
 
 
 
 
 
-def AllKeysWindow():
+def AllKeys():
 
     # Novi window
-    global allKyesWindow
-    allKyesWindow = Toplevel()
-    allKyesWindow.title("Enter credentials")
-    allKyesWindow.resizable(False,False)
+    global allKeysWindow
+    allKeysWindow = Toplevel()
+    allKeysWindow.title("Enter credentials")
+    allKeysWindow.resizable(False, False)
 
     # Generisanje widgeta
-    labelInfo = Label(allKyesWindow, text="Enter credentials")
+    labelInfo = Label(allKeysWindow, text="Enter credentials")
 
-    labelName = Label(allKyesWindow, text="Enter name: ", bd=1, relief="sunken")
-    entryName = Entry(allKyesWindow, width=100)
+    labelName = Label(allKeysWindow, text="Enter name: ", bd=1, relief="sunken")
+    entryName = Entry(allKeysWindow, width=100)
 
-    labelEmail = Label(allKyesWindow, text="Enter Email: ", bd=1, relief="sunken")
-    entryEmail = Entry(allKyesWindow, width=100)
+    labelEmail = Label(allKeysWindow, text="Enter Email: ", bd=1, relief="sunken")
+    entryEmail = Entry(allKeysWindow, width=100)
 
-    buttonDone = Button(allKyesWindow, text="Show", command=lambda: showAllKeysWindow(entryName.get(), entryEmail.get()))
+    buttonDone = Button(allKeysWindow, text="Show", command=lambda: ShowAllKeys(entryName.get(), entryEmail.get()))
 
 
     # Pozicioniranje
@@ -40,15 +41,15 @@ def AllKeysWindow():
 
     buttonDone.grid(row=6, column=0, columnspan=2, pady=10)
 
-def showAllKeysWindow(name,email):
-    allKyesWindow.destroy()
+def ShowAllKeys(name,email):
+    allKeysWindow.destroy()
 
     # Provera Regexa
     regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
     if name == "":
-        AllKeysWindow()
+        AllKeys()
     elif email == "" or (not re.fullmatch(regex, email)):
-        AllKeysWindow()
+        AllKeys()
 
     global showAllKeysWindow
     showAllKeysWindow=Toplevel()
@@ -70,11 +71,11 @@ def showAllKeysWindow(name,email):
         polje = [el.userId, el.algorithm, el.EcryptedPrivateKey, el.publicKey ]
         tv.insert('','end',values=polje)
 
-    buttonShow = Button(showAllKeysWindow, text="Show my private keys", command=lambda: passwordForPrivateKey(keys))
+    buttonShow = Button(showAllKeysWindow, text="Show my private keys", command=lambda: PasswordForPrivateKey(keys))
     buttonShow.pack(side=tkinter.LEFT,padx=10,pady=10)
 
 
-def passwordForPrivateKey(keys):
+def PasswordForPrivateKey(keys):
 
     # Novi window
     global showPrivateKeysPasswordWindow
@@ -85,7 +86,7 @@ def passwordForPrivateKey(keys):
     labelInfo = Label(showPrivateKeysPasswordWindow, text="Enter your password")
     entryPassword = Entry(showPrivateKeysPasswordWindow, width=50)
 
-    buttonDone = Button(showPrivateKeysPasswordWindow, text="Done", command=lambda: showPrivateKeysWindow(keys,sha1_hash(entryPassword.get())))
+    buttonDone = Button(showPrivateKeysPasswordWindow, text="Done", command=lambda: ShowPrivateKeys(keys,sha1_hash(entryPassword.get())))
 
     # Pozicioniranje
     labelInfo.grid(row=0, column=0, columnspan=2, pady=3, padx=50)
@@ -93,7 +94,7 @@ def passwordForPrivateKey(keys):
     buttonDone.grid(row=2, column=0, columnspan=2, pady=20, padx=50)
 
 
-def showPrivateKeysWindow(keys,sifra):
+def ShowPrivateKeys(keys,sifra):
     showPrivateKeysPasswordWindow.destroy()
 
 

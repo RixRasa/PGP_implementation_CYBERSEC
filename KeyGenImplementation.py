@@ -14,6 +14,12 @@ class PrivateKeyRing:
         self.publicKey = publicKey
         self.publicKeyId = publicKey[-8:]
 
+    def __str__(self):
+        print(self.userId + " - " + self.algorithm + " - " + self.hashedPassphrade)
+        print(self.publicKey)
+        print(self.EcryptedPrivateKey)
+
+
 
     def export1(self, filename):
         print()
@@ -24,7 +30,7 @@ class PrivateKeyRing:
 #dictionaryOfPrivateKeyRings = {"ilija@gmail.comilija":[PrivateKeyRing("ilija@gmail.com","Ilija","be77e3d34969ee11d2789f625efac759","Rsa","123","***")
 #                                       ,PrivateKeyRing("lizard123400@gmail.com","Ilija","be77e3d34969ee11d2789f625efac759","Rsa","456","***")]}
 dictionaryOfPrivateKeyRings = {}
-dictionaryOfPrublicKeyRings = {}
+dictionaryOfPublicKeyRings = {}
 
 class PublicKeyRing:
     def __init__(self, userId, algorithm, publicKey):
@@ -33,7 +39,9 @@ class PublicKeyRing:
         self.publicKey = publicKey
         self.publicKeyId = publicKey[-8:]
 
-
+    def __str__(self):
+        print(self.userId + " - " + self.algorithm)
+        print(self.publicKey)
 
 def GeneratingKey(name, email, password, algorithm):
     if(algorithm == 1):# RSA
@@ -53,7 +61,6 @@ def GenerateRsaKey(name, email, password):
     #Pretvaramo kljuceve iz RsaKey objekta u bytes
     privateKey = key.export_key(format = 'PEM' ,passphrase=hashedPassphrase) #eksportujemo u byte string formata 'PEM'
     publicKey = key.public_key().export_key()
-    print(privateKey); print(publicKey)
 
     #Pravimo objekat
     keyRing = PrivateKeyRing(email, name , hashedPassphrase, "Rsa", publicKey, privateKey)
@@ -64,6 +71,7 @@ def GenerateRsaKey(name, email, password):
     else:
         dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
 
+    keyRing.__str__()
 
 
 def GenerateElGamalKey(name, email, password):
@@ -74,7 +82,6 @@ def GenerateElGamalKey(name, email, password):
 
     privateKeyExport = privateKey.export_key(hashedPassphrase)#eksportujemo u byte string formata 'PEM'
     publicKeyExport = publicKey.export_key()
-    print(privateKeyExport);print(publicKeyExport)
 
     # Pravimo objekat
     keyRing = PrivateKeyRing(email, name, hashedPassphrase, "ElGamal", publicKeyExport, privateKeyExport)
@@ -85,6 +92,7 @@ def GenerateElGamalKey(name, email, password):
     else:
         dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
 
+    keyRing.__str__()
 
 
 def GenerateDsaKey(name, email, password):
@@ -96,7 +104,6 @@ def GenerateDsaKey(name, email, password):
     # Pretvaramo kljuceve iz RsaKey objekta u bytes
     privateKey = key.export_key(format = 'PEM',passphrase=hashedPassphrase)
     publicKey = key.public_key().export_key()
-    print(privateKey);print(publicKey)
 
     # Pravimo objekat
     keyRing = PrivateKeyRing(email, name, hashedPassphrase, "Dsa", publicKey, privateKey)
@@ -107,7 +114,7 @@ def GenerateDsaKey(name, email, password):
     else:
         dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
 
-
+    keyRing.__str__()
 
 
 

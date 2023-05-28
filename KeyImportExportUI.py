@@ -1,16 +1,61 @@
 from tkinter import *
 from tkinter.ttk import *
-from tkinter.filedialog import askopenfile, askopenfilename
-from KeyImportExportImplementation import importKey
+from tkinter.filedialog import askopenfilename
 from KeyGenImplementation import *
 
 
 
 
 
-def open_file_import():
+def open_file_import(name, email, password):
     file_path = askopenfilename()
-    print(file_path)
+
+    with open(file_path, "rb") as file:
+        byteString = file.read()
+        prORpb, algorithm, userId, key = byteString.split(b'*')
+
+        #If its public key
+        if(prORpb == b'private'):
+            hashedPassphrase = sha1_hash(password)
+            keyRing = ''
+
+            if(algorithm == b'Rsa'):
+                publicKey = RSA.import_key(key, passphrase=hashedPassphrase).public_key().export_key()
+                keyRing = PrivateKeyRing(email, name, hashedPassphrase, "Rsa", publicKey, key)
+
+            elif(algorithm == b'ElGamal'):
+                publicKey = PrivateKey.import_key(hashedPassphrase, key).generatePublicKey().export_key()
+                keyRing = PrivateKeyRing(email, name, hashedPassphrase, "ElGamal", publicKey, key)
+
+            elif(algorithm == b'Dsa'):
+                publicKey = DSA.import_key(key, passphrase=hashedPassphrase).public_key().export_key()
+                keyRing = PrivateKeyRing(email, name, hashedPassphrase, "Dsa", publicKey, key)
+
+            if not dictionaryOfPrivateKeyRings.__contains__(email + name):
+                dictionaryOfPrivateKeyRings[email + name] = []
+                dictionaryOfPrivateKeyRings[email + name].append(keyRing)
+            else:
+                dictionaryOfPrivateKeyRings[email + name].append(keyRing)
+
+        #If its private key
+        elif(prORpb == b'public'):
+            keyRing = PublicKeyRing(userId.decode('utf-8'), algorithm.decode('utf-8'), key)
+
+            if not dictionaryOfPublicKeyRings.__contains__(email + name):
+                dictionaryOfPublicKeyRings[email + name] = []
+                dictionaryOfPublicKeyRings[email + name].append(keyRing)
+            else:
+                dictionaryOfPublicKeyRings[email + name].append(keyRing)
+
+
+        for key in dictionaryOfPrivateKeyRings:
+            for value in dictionaryOfPrivateKeyRings[key]:
+                print(value.__str__())
+
+        for key in dictionaryOfPublicKeyRings:
+            for value in dictionaryOfPublicKeyRings[key]:
+                print(value.__str__())
+
 
 
 
@@ -20,17 +65,18 @@ def CredentialsForImportWindow():
     keyImportWindow = Toplevel()
     keyImportWindow.title("Key Import Window")
 
-    labelName = Label(keyImportWindow, text="Enter name: " )
+    labelName = Label(keyImportWindow, text="Enter name of user that is importing key: " )
     entryName = Entry(keyImportWindow, width=100)
 
-    labelEmail = Label(keyImportWindow, text="Enter Email: ")
+    labelEmail = Label(keyImportWindow, text="Enter Email of user that is importing key: ")
     entryEmail = Entry(keyImportWindow, width=100)
 
-    labelPassword = Label(keyImportWindow, text="If you are importing private key please provide us your passphrase:")
+    labelPassword1 = Label(keyImportWindow, text="If you are importing your private key please provide us your passphrase:")
+    labelPassword2 = Label(keyImportWindow,text="If you are importing someone else's public key you dont need to enter password:")
     entryPassword = Entry(keyImportWindow, width=50)
 
     labelUpload = Label(keyImportWindow, text='Import Public or Private Key')
-    buttonChoose = Button(keyImportWindow, text='Choose Key', command=lambda: open_file_import())
+    buttonChoose = Button(keyImportWindow, text='Choose Key', command=lambda: open_file_import(entryName.get(), entryEmail.get(), entryPassword.get()))
 
     #Pozicioniranje
     labelName.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
@@ -39,13 +85,14 @@ def CredentialsForImportWindow():
     labelEmail.grid(row=2, column=0, columnspan=3, padx=5, pady=5)
     entryEmail.grid(row=3, column=0, columnspan=3, padx=20, pady=(5,25))
 
-    labelPassword.grid(row=4, column=0, columnspan=3, padx=5, pady=5)
-    entryPassword.grid(row=5, column=0, columnspan=3, padx=20, pady=(5,25))
+    labelPassword1.grid(row=4, column=0, columnspan=3, padx=5, pady=5)
+    labelPassword2.grid(row=5, column=0, columnspan=3, padx=5, pady = (0,5))
+    entryPassword.grid(row=6, column=0, columnspan=3, padx=20, pady=(5,25))
 
-    labelUpload.grid(row=6, column=0, padx=20, pady=25)
-    buttonChoose.grid(row=6, column=1, padx=20, pady=25)
+    labelUpload.grid(row=7, column=0, padx=20, pady=25)
+    buttonChoose.grid(row=7, column=1, padx=20, pady=25)
 
-    keyImportWindow.mainloop()
+
 
 
 
@@ -88,6 +135,7 @@ def ExportKeysWindow(name,email):
 
     keys = dictionaryOfPrivateKeyRings.get(email + name)
 
+    global table
     table = []
     for el in keys:
         table.append([el.EcryptedPrivateKey, el.publicKey, el.algorithm, el.userId])
@@ -97,31 +145,23 @@ def ExportKeysWindow(name,email):
             label = Label(root, text=value[0:200])
             label.grid(row=i, column=j, padx=10, pady=5)
 
-        first_button = Button(root, text="Export private key", command= lambda : open_file_export(row[0], row[2], row[3], b'private'))
+        first_button = Button(root, text="Export private key", command= lambda id = i : open_file_export(id, b'private'))
         first_button.grid(row=i, column=len(row), padx=5)
 
-        second_button = Button(root, text="Export public key", command=lambda : open_file_export(row[1], row[2], row[3], b'public'))
+        second_button = Button(root, text="Export public key", command=lambda id = i: open_file_export(id, b'public'))
         second_button.grid(row=i, column=len(row) + 1)
 
     # Start the main event loop
 
-def open_file_export(value, algorithm, userId, prORpb):
+def open_file_export(i, prORpb):
+    print(i)
+    value = table[i][ 0 if prORpb == b'private' else 1]
+    algorithm = table[i][2]
+    userId = table[i][3]
+
     file_path = askopenfilename()
     with open(file_path,"wb") as file:
         file.write(prORpb + b'*' +algorithm.encode('utf-8') + b'*' + userId.encode('utf-8') + b'*' + value)
         file.close()
-'''def get_first_column_value(row):
-    value = table[row][0]
-    global keyExportWindow
-    keyExportWindow = Toplevel()
-    keyExportWindow.title("Key Import Window")
 
-    labelUpload = Label(keyExportWindow, text='Choose where you will export key')
-    buttonChoose = Button(keyExportWindow, text='Choose file location', command=lambda: open_file_export(value))
-
-
-    labelUpload.grid(row=0, column=0, padx=20, pady=25)
-    buttonChoose.grid(row=0, column=1, padx=20, pady=25)
-
-    print("Public key:", value)'''
 
