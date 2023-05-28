@@ -1,25 +1,23 @@
-from tkinter import *
 from KeyGenUI import KeyGeneratorWindow
 from SeeAllKeysUI import *
 
-from KeyImportExportUI import KeyImportUI,CredentialsForExportWindow
+from KeyImportExportUI import CredentialsForImportWindow,CredentialsForExportWindow
 #Funkcije buttona (Odvajacemo logiku od izgleda)
 def KeyGen():
     KeyGeneratorWindow()
 
 def ListKeys():
     AllKeysWindow()
-    print("List of Keys -  not yet implemented")
-
-def SendMsg():
-    print("Sending a Message  - not yet implemented")
 
 def KeyImport():
-    KeyImportUI()
+    CredentialsForImportWindow()
 
 def KeyExport():
     #print("kita")
     CredentialsForExportWindow()
+
+def SendMsg():
+    print("Sending a Message  - not yet implemented")
 
 
 global root
@@ -48,25 +46,6 @@ root.mainloop()
 
 
 
-'''from Crypto.PublicKey import RSA
-
-def export_private_key(private_key, filename):
-    with open(filename, "wb") as file:
-        file.write(private_key.exportKey('PEM', 'MyPassphrase'))
-
-def export_public_key(public_key, filename):
-    with open(filename,"wb") as file:
-        file.write(public_key.exportKey('PEM'))
-        file.close()
-
-keypair = RSA.generate(1024)
-public_key = keypair.public_key()
-
-
-export_public_key(keypair, 'private_key.pem')
-export_public_key(public_key, 'public_key.pem')
-
-string = "kurac"'''
 
 
 

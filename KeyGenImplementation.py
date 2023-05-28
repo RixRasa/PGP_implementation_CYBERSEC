@@ -16,20 +16,22 @@ class PrivateKeyRing:
 
 
     def export1(self, filename):
-
         print()
+
     def import1(self, filename):
         print()
 
 #dictionaryOfPrivateKeyRings = {"ilija@gmail.comilija":[PrivateKeyRing("ilija@gmail.com","Ilija","be77e3d34969ee11d2789f625efac759","Rsa","123","***")
 #                                       ,PrivateKeyRing("lizard123400@gmail.com","Ilija","be77e3d34969ee11d2789f625efac759","Rsa","456","***")]}
 dictionaryOfPrivateKeyRings = {}
-'''class PublicKeyRing:
-    def __init__(self, email, name, password, algorithm, publicKey, privateKey):
-        self.userId = email + name
+dictionaryOfPrublicKeyRings = {}
+
+class PublicKeyRing:
+    def __init__(self, userId, algorithm, publicKey):
+        self.userId = userId
         self.algorithm = algorithm
-        self.EcryptedPrivateKey = privateKey
-        self.publicKey = publicKey'''
+        self.publicKey = publicKey
+        self.publicKeyId = publicKey[-8:]
 
 
 
@@ -44,22 +46,23 @@ def GeneratingKey(name, email, password, algorithm):
 
 def GenerateRsaKey(name, email, password):
     key = RSA.generate(2048) #Dobijamo OBJEKAT RsaKey
+
     # Hashujemo passphrase sa SHA1
     hashedPassphrase = sha1_hash(password)
 
     #Pretvaramo kljuceve iz RsaKey objekta u bytes
-    privateKey = key.export_key(passphrase=hashedPassphrase) #eksportujemo u byte string formata 'PEM'
+    privateKey = key.export_key(format = 'PEM' ,passphrase=hashedPassphrase) #eksportujemo u byte string formata 'PEM'
     publicKey = key.public_key().export_key()
+    print(privateKey); print(publicKey)
 
     #Pravimo objekat
-    keyRing = PrivateKeyRing(email, name , hashedPassphrase, "Rsa", privateKey, publicKey)
+    keyRing = PrivateKeyRing(email, name , hashedPassphrase, "Rsa", publicKey, privateKey)
 
     if not dictionaryOfPrivateKeyRings.__contains__(keyRing.userId):
         dictionaryOfPrivateKeyRings[keyRing.userId] = []
         dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
     else:
         dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
-
 
 
 
@@ -71,9 +74,10 @@ def GenerateElGamalKey(name, email, password):
 
     privateKeyExport = privateKey.export_key(hashedPassphrase)#eksportujemo u byte string formata 'PEM'
     publicKeyExport = publicKey.export_key()
+    print(privateKeyExport);print(publicKeyExport)
 
     # Pravimo objekat
-    keyRing = PrivateKeyRing(email, name, hashedPassphrase, "ElGamal", privateKeyExport, publicKeyExport)
+    keyRing = PrivateKeyRing(email, name, hashedPassphrase, "ElGamal", publicKeyExport, privateKeyExport)
 
     if not dictionaryOfPrivateKeyRings.__contains__(keyRing.userId):
         dictionaryOfPrivateKeyRings[keyRing.userId] = []
@@ -90,11 +94,12 @@ def GenerateDsaKey(name, email, password):
     hashedPassphrase = sha1_hash(password)
 
     # Pretvaramo kljuceve iz RsaKey objekta u bytes
-    privateKey = key.export_key(passphrase=hashedPassphrase)
+    privateKey = key.export_key(format = 'PEM',passphrase=hashedPassphrase)
     publicKey = key.public_key().export_key()
+    print(privateKey);print(publicKey)
 
     # Pravimo objekat
-    keyRing = PrivateKeyRing(email, name, hashedPassphrase, "Dsa", privateKey, publicKey)
+    keyRing = PrivateKeyRing(email, name, hashedPassphrase, "Dsa", publicKey, privateKey)
 
     if not dictionaryOfPrivateKeyRings.__contains__(keyRing.userId):
         dictionaryOfPrivateKeyRings[keyRing.userId] = []

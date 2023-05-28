@@ -1,6 +1,4 @@
-import tkinter
 from tkinter import *
-from tkinter import ttk
 from KeyGenImplementation import *
 import re
 

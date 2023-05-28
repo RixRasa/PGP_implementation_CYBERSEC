@@ -2,6 +2,7 @@ import tkinter
 from tkinter import *
 from tkinter import ttk
 from KeyGenImplementation import *
+from ElGamalImpl import PrivateKey
 import re
 
 
@@ -9,7 +10,7 @@ import re
 
 
 def AllKeysWindow():
-    #print(hashedPassphrase)
+
     # Novi window
     global allKyesWindow
     allKyesWindow = Toplevel()
@@ -25,8 +26,7 @@ def AllKeysWindow():
     labelEmail = Label(allKyesWindow, text="Enter Email: ", bd=1, relief="sunken")
     entryEmail = Entry(allKyesWindow, width=100)
 
-    buttonDone = Button(allKyesWindow, text="Show",
-                        command=lambda: showAllKeysWindow(entryName.get(), entryEmail.get()))
+    buttonDone = Button(allKyesWindow, text="Show", command=lambda: showAllKeysWindow(entryName.get(), entryEmail.get()))
 
 
     # Pozicioniranje
@@ -50,42 +50,31 @@ def showAllKeysWindow(name,email):
     elif email == "" or (not re.fullmatch(regex, email)):
         AllKeysWindow()
 
-    else:
-        global showAllKeysWindow
+    global showAllKeysWindow
+    showAllKeysWindow=Toplevel()
+    showAllKeysWindow.title("All your keys")
 
+    frm=Frame(showAllKeysWindow)
+    frm.pack(side=tkinter.LEFT,padx=20)
 
+    tv=ttk.Treeview(frm,columns=(1,2,3,4),show="headings",height="5")
+    tv.pack()
+    tv.heading(1, text="User ID")
+    tv.heading(2, text="Algorithm")
+    tv.heading(3, text="Ecrypted Private Key")
+    tv.heading(4, text="Public Key")
 
-        showAllKeysWindow=Toplevel()
-        showAllKeysWindow.title("All your keys")
-        frm=Frame(showAllKeysWindow)
-        frm.pack(side=tkinter.LEFT,padx=20)
-        tv=ttk.Treeview(frm,columns=(1,2,3,4),show="headings",height="5")
-        tv.pack()
+    keys=dictionaryOfPrivateKeyRings.get(email+name)
 
-        tv.heading(1, text="User ID")
+    for el in keys:
+        polje = [el.userId, el.algorithm, el.EcryptedPrivateKey, el.publicKey ]
+        tv.insert('','end',values=polje)
 
-        tv.heading(2, text="Algorithm")
-        tv.heading(3, text="Ecrypted Private Key")
-        tv.heading(4, text="Public Key")
+    buttonShow = Button(showAllKeysWindow, text="Show my private keys", command=lambda: passwordForPrivateKey(keys))
+    buttonShow.pack(side=tkinter.LEFT,padx=10,pady=10)
 
-        keys=dictionaryOfPrivateKeyRings.get(email+name)
-
-
-
-        for el in keys:
-            #print(el.hashedPassphrade)
-            polje = [el.userId, el.algorithm, el.EcryptedPrivateKey, el.publicKey ]
-            tv.insert('','end',values=polje)
-
-        buttonShow = Button(showAllKeysWindow, text="Show my private keys",
-                            command=lambda: passwordForPrivateKey(keys))
-        buttonShow.pack(side=tkinter.LEFT,padx=10,pady=10)
-#stojanovicrasa4@gmail.com
 
 def passwordForPrivateKey(keys):
-
-
-
 
     # Novi window
     global showPrivateKeysPasswordWindow
@@ -96,9 +85,7 @@ def passwordForPrivateKey(keys):
     labelInfo = Label(showPrivateKeysPasswordWindow, text="Enter your password")
     entryPassword = Entry(showPrivateKeysPasswordWindow, width=50)
 
-
-    buttonDone = Button(showPrivateKeysPasswordWindow, text="Done",
-                        command=lambda: showPrivateKeysWindow(keys,sha1_hash(entryPassword.get())))
+    buttonDone = Button(showPrivateKeysPasswordWindow, text="Done", command=lambda: showPrivateKeysWindow(keys,sha1_hash(entryPassword.get())))
 
     # Pozicioniranje
     labelInfo.grid(row=0, column=0, columnspan=2, pady=3, padx=50)
@@ -107,38 +94,40 @@ def passwordForPrivateKey(keys):
 
 
 def showPrivateKeysWindow(keys,sifra):
-
-    print("Sifra sa kojom poredim polje keys:"+sifra)
-    if sifra != keys[0].hashedPassphrade:
-        print(keys[0].hashedPassphrade)
-        print("NE POKLAPA SE")
-    else:
-        global showPrivateKeysWindow
-
-        showPrivateKeysWindow = Tk()
-        showPrivateKeysWindow.title("All your private keys")
-        frm = Frame(showPrivateKeysWindow)
-        frm.pack(side=tkinter.LEFT, padx=20)
-        tv = ttk.Treeview(frm, columns=(1, 2), show="headings", height="5")
-        tv.pack()
+    showPrivateKeysPasswordWindow.destroy()
 
 
-        tv.heading(1, text="Algorithm")
-        tv.heading(2, text="Decrypted Private Key")
+    global showPrivateKeysWindow
+    showPrivateKeysWindow = Toplevel()
+    showPrivateKeysWindow.title("All your private keys")
 
+    frm = Frame(showPrivateKeysWindow)
+    frm.pack(side=tkinter.LEFT, padx=20)
 
+    tv = ttk.Treeview(frm, columns=(1, 2), show="headings", height="5")
+    tv.pack()
+    tv.heading(1, text="Algorithm")
+    tv.heading(2, text="Decrypted Private Key")
 
+    for key in keys:
+        string = ""
+        if(key.hashedPassphrade == sifra):
 
-        for el in keys:
-            privateKey = 0
-            if(el.algorithm == "Rsa"):
-                privateKey = str(RSA.import_key(el.EcryptedPrivateKey, passphrase= el.hashedPassphrade))
-            elif(el.algorithm == "Dsa"):
-                privateKey = str(DSA.import_key(el.hashedPassphrade, passphrase= el.hashedPassphrade))
-            elif(el.algorithm == "ElGamal"):
-                privateKey = "..."
+            if(key.algorithm == "Rsa"):
+                privateKey = RSA.import_key(key.EcryptedPrivateKey, passphrase=sifra)
+                privateKey.public_key()
+                string = str(privateKey.d) + " - " + str(privateKey.n)
+                print(string)
 
+            elif(key.algorithm == "Dsa"):
+                privateKey = DSA.import_key(key.EcryptedPrivateKey, passphrase=sifra)
+                string = privateKey
+                print(string)
 
+            elif(key.algorithm == "ElGamal"):
+                privateKey = PrivateKey.import_key(sifra, key.EcryptedPrivateKey)
+                string =str(privateKey.key) + " - " + str(privateKey.q)
+                print(string)
 
-            polje = [el.algorithm,privateKey]
+            polje = [key.algorithm, string]
             tv.insert('', 'end', values=polje)

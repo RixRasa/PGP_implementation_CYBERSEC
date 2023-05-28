@@ -24,7 +24,8 @@ class PublicKey():
 
         return stringBytesEcode64
 
-    def import_key(self, stringBytesEcode64):
+    @staticmethod
+    def import_key(stringBytesEcode64):
         stringBytesEcode64 = stringBytesEcode64[35: -33] #Skidanje zaglavlja
 
         stringBytes = base64.b64decode(stringBytesEcode64) #Deckodovanje iz 'pem' formata
@@ -32,13 +33,19 @@ class PublicKey():
         string = stringBytes.decode('utf-8') #Prebacivanje iz bytes u string
 
         q,g,h = string.split('/') #Splitovanje stringa i ubacivanje vrednosti
-        print(q); print(g); print(h)# samo za testiranje
+
+        return PublicKey(int(q), int(g), int(h))
 
 
 class PrivateKey():
     def __init__(self, key, q):
         self.key = key
         self.q = q
+
+    def generatePublicKey(self):
+        g = random.randint(2, self.q)
+        h = power(g, self.key, self.q)
+        return PublicKey(self.q, g, h)
 
     def export_key(self, passphrase):
         #print(self.key); print(self.q)#samo za testiranje
@@ -56,7 +63,8 @@ class PrivateKey():
 
         return stringBytesEcode64
 
-    def import_key(self, passphrase, stringBytesEcode64):
+    @staticmethod
+    def import_key(passphrase, stringBytesEcode64):
         hashedPassphrase = truncate_hash(sha1_hash(passphrase), 128)#Hashirsamo sifru
 
         privateKeyEncripted = base64.b64decode(stringBytesEcode64[36:-34])#Skidamo zaglavlje i decodujemo iz 'pem-a'
@@ -70,7 +78,7 @@ class PrivateKey():
 
         key, q = string.split('/') #Splitovanje stringa i ubacivanje vrednosti
 
-        print(key); print(q)# samo za testiranje
+        return PrivateKey(int(key), int(q))
 
 
 
@@ -94,7 +102,7 @@ def gcd(a, b):
     if a < b:
         return gcd(b, a)
     elif a % b == 0:
-        return b;
+        return b
     else:
         return gcd(b, a % b)
 
@@ -115,7 +123,7 @@ def power(a, b, c):
 
     while b > 0:
         if b % 2 != 0:
-            x = (x * y) % c;
+            x = (x * y) % c
         y = (y * y) % c
         b = int(b / 2)
 
@@ -124,7 +132,7 @@ def power(a, b, c):
 
 
 #||||||||||||||||||||||||||||||||||||||||||||ENKRIPCIJA I DEKRIPCIJA||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-def encrypt(msg, publicKey):
+def encryptElGamal(msg, publicKey):
     h = publicKey.h; q = publicKey.q; g = publicKey.g
 
     en_msg = []
@@ -142,7 +150,7 @@ def encrypt(msg, publicKey):
     return en_msg, p
 
 
-def decrypt(en_msg, p, privateKey):
+def decryptElGamal(en_msg, p, privateKey):
     key = privateKey.key; q = privateKey.q
 
     dr_msg = []
@@ -164,7 +172,7 @@ def main():
     private.import_key("Kurcina", private.export_key("Kurcina"))
 
 
-    en_msg, p = encrypt(msg, public)
-    dr_msg = decrypt(en_msg, p, private)
+    en_msg, p = encryptElGamal(msg, public)
+    dr_msg = decryptElGamal(en_msg, p, private)
     dmsg = ''.join(dr_msg)
     print("Decrypted Message :", dmsg)
