@@ -24,10 +24,8 @@ def AllKeys():
     labelName = Label(allKeysWindow, text="Enter name: ", bd=1, relief="sunken")
     entryName = Entry(allKeysWindow, width=100)
 
-    labelEmail = Label(allKeysWindow, text="Enter Email: ", bd=1, relief="sunken")
-    entryEmail = Entry(allKeysWindow, width=100)
 
-    buttonDone = Button(allKeysWindow, text="Show", command=lambda: ShowAllKeys(entryName.get(), entryEmail.get()))
+    buttonDone = Button(allKeysWindow, text="Show", command=lambda: ShowAllKeys(entryName.get()))
 
 
     # Pozicioniranje
@@ -36,20 +34,15 @@ def AllKeys():
     labelName.grid(row=1, column=0, columnspan=2, pady=3)
     entryName.grid(row=2, column=0, columnspan=2, pady=10)
 
-    labelEmail.grid(row=3, column=0, columnspan=2, pady=3)
-    entryEmail.grid(row=4, column=0, columnspan=2, pady=10)
+    buttonDone.grid(row=4, column=0, columnspan=2, pady=10)
 
-    buttonDone.grid(row=6, column=0, columnspan=2, pady=10)
-
-def ShowAllKeys(name,email):
+def ShowAllKeys(name):
     allKeysWindow.destroy()
 
     # Provera Regexa
-    regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
     if name == "":
         AllKeys()
-    elif email == "" or (not re.fullmatch(regex, email)):
-        AllKeys()
+
 
     global showAllKeysWindow
     showAllKeysWindow=Toplevel()
@@ -65,7 +58,7 @@ def ShowAllKeys(name,email):
     tv.heading(3, text="Ecrypted Private Key")
     tv.heading(4, text="Public Key")
 
-    keys=dictionaryOfPrivateKeyRings.get(email+name)
+    keys=dictionaryOfPrivateKeyRings.get(name)
 
     for el in keys:
         polje = [el.userId, el.algorithm, el.EcryptedPrivateKey, el.publicKey ]

@@ -14,7 +14,7 @@ def open_file_import(name, email, password):
         byteString = file.read()
         prORpb, algorithm, userId, key = byteString.split(b'*')
 
-        #If its public key
+        #If its private key
         if(prORpb == b'private'):
             hashedPassphrase = sha1_hash(password)
             keyRing = ''
@@ -31,21 +31,22 @@ def open_file_import(name, email, password):
                 publicKey = DSA.import_key(key, passphrase=hashedPassphrase).public_key().export_key()
                 keyRing = PrivateKeyRing(email, name, hashedPassphrase, "Dsa", publicKey, key)
 
-            if not dictionaryOfPrivateKeyRings.__contains__(email + name):
-                dictionaryOfPrivateKeyRings[email + name] = []
-                dictionaryOfPrivateKeyRings[email + name].append(keyRing)
+            if not dictionaryOfPrivateKeyRings.__contains__(name):
+                dictionaryOfPrivateKeyRings[name] = []
+                dictionaryOfPrivateKeyRings[name].append(keyRing)
             else:
-                dictionaryOfPrivateKeyRings[email + name].append(keyRing)
+                dictionaryOfPrivateKeyRings[name].append(keyRing)
 
-        #If its private key
+
+        #If its public key
         elif(prORpb == b'public'):
             keyRing = PublicKeyRing(userId.decode('utf-8'), algorithm.decode('utf-8'), key)
 
-            if not dictionaryOfPublicKeyRings.__contains__(email + name):
-                dictionaryOfPublicKeyRings[email + name] = []
-                dictionaryOfPublicKeyRings[email + name].append(keyRing)
+            if not dictionaryOfPublicKeyRings.__contains__(name):
+                dictionaryOfPublicKeyRings[name] = []
+                dictionaryOfPublicKeyRings[name].append(keyRing)
             else:
-                dictionaryOfPublicKeyRings[email + name].append(keyRing)
+                dictionaryOfPublicKeyRings[name].append(keyRing)
 
 
         for key in dictionaryOfPrivateKeyRings:
@@ -68,7 +69,7 @@ def CredentialsForImportWindow():
     labelName = Label(keyImportWindow, text="Enter name of user that is importing key: " )
     entryName = Entry(keyImportWindow, width=100)
 
-    labelEmail = Label(keyImportWindow, text="Enter Email of user that is importing key: ")
+    labelEmail = Label(keyImportWindow, text="Enter Email of user that is importing key ( Only if you are importing your private key! ): ")
     entryEmail = Entry(keyImportWindow, width=100)
 
     labelPassword1 = Label(keyImportWindow, text="If you are importing your private key please provide us your passphrase:")
@@ -110,10 +111,7 @@ def CredentialsForExportWindow():
     labelName = Label(credentialsForExportWindow, text="Enter name: ", relief="sunken")
     entryName = Entry(credentialsForExportWindow, width=100)
 
-    labelEmail = Label(credentialsForExportWindow, text="Enter Email: ", relief="sunken")
-    entryEmail = Entry(credentialsForExportWindow, width=100)
-
-    buttonDone = Button(credentialsForExportWindow, text="Export", command=lambda: ExportKeysWindow(entryName.get(), entryEmail.get()))
+    buttonDone = Button(credentialsForExportWindow, text="Export", command=lambda: ExportKeysWindow(entryName.get()))
 
     # Pozicioniranje
     labelInfo.grid(row=0, column=0, columnspan=2, pady=10)
@@ -121,19 +119,16 @@ def CredentialsForExportWindow():
     labelName.grid(row=1, column=0, columnspan=2, pady=3)
     entryName.grid(row=2, column=0, columnspan=2, pady=10)
 
-    labelEmail.grid(row=3, column=0, columnspan=2, pady=3)
-    entryEmail.grid(row=4, column=0, columnspan=2, pady=10)
+    buttonDone.grid(row=4, column=0, columnspan=2, pady=10)
 
-    buttonDone.grid(row=6, column=0, columnspan=2, pady=10)
-
-def ExportKeysWindow(name,email):
+def ExportKeysWindow(name):
     credentialsForExportWindow.destroy()
 
     global root
     root = Toplevel()
     # Create the table
 
-    keys = dictionaryOfPrivateKeyRings.get(email + name)
+    keys = dictionaryOfPrivateKeyRings.get(name)
 
     global table
     table = []
@@ -154,7 +149,6 @@ def ExportKeysWindow(name,email):
     # Start the main event loop
 
 def open_file_export(i, prORpb):
-    print(i)
     value = table[i][ 0 if prORpb == b'private' else 1]
     algorithm = table[i][2]
     userId = table[i][3]

@@ -1,7 +1,7 @@
 from KeyGenUI import KeyGeneratorWindow
 from SeeAllKeysUI import *
 from KeyImportExportUI import CredentialsForImportWindow,CredentialsForExportWindow
-from SendMessageUI import SendMessageOptions
+from SendReceiveMessageUI import SendUI,ReceiveUI
 #Funkcije buttona (Odvajacemo logiku od izgleda)
 def KeyGen():
     KeyGeneratorWindow()
@@ -13,14 +13,13 @@ def KeyImport():
     CredentialsForImportWindow()
 
 def KeyExport():
-    #print("kita")
     CredentialsForExportWindow()
 
 def SendMsg():
-    SendMessageOptions()
+    SendUI()
 
 def ReceiveMsg():
-    print("Recive a Message - not yet implemented")
+    ReceiveUI()
 
 
 global root

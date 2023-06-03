@@ -22,24 +22,26 @@ def KeyGeneratorWindow():
 
     r = IntVar()
     chooseAlgorithhmRsa = Radiobutton(keyGeneratorInputWindow, text ="Rsa", variable=r, value = 1)
-    chooseAlgorithhmDsa = Radiobutton(keyGeneratorInputWindow, text="DSA / ElGamal", variable=r, value=2)
+    chooseAlgorithhmDsa = Radiobutton(keyGeneratorInputWindow, text="DSA", variable=r, value=2)
+    chooseAlgorithhmElGamal = Radiobutton(keyGeneratorInputWindow, text="ElGamal", variable=r, value=3)
 
     buttonDone = Button(keyGeneratorInputWindow, text ="Generate", command = lambda: PasswordWindow(entryName.get(), entryEmail.get(), r.get()))
 
 
     #Pozicioniranje
-    labelInfo.grid(row = 0, column=0, columnspan=2, pady = 10)
+    labelInfo.grid(row = 0, column=0, columnspan=3, pady = 10)
 
-    labelName.grid(row = 1, column=0, columnspan=2, pady = 3)
-    entryName.grid(row = 2, column= 0, columnspan=2, pady = 10, padx = 10)
+    labelName.grid(row = 1, column=0, columnspan=3, pady = 3)
+    entryName.grid(row = 2, column= 0, columnspan=3, pady = 10, padx = 10)
 
-    labelEmail.grid(row=3, column=0, columnspan=2, pady=3)
-    entryEmail.grid(row = 4, column= 0, columnspan=2, pady = 10)
+    labelEmail.grid(row=3, column=0, columnspan=3, pady=3)
+    entryEmail.grid(row = 4, column= 0, columnspan=3, pady = 10)
 
     chooseAlgorithhmRsa.grid(row = 5, column= 0 , padx = 10, pady = 10)
     chooseAlgorithhmDsa.grid(row = 5, column= 1, pady = 10)
+    chooseAlgorithhmElGamal.grid(row = 5, column= 2, pady = 10)
 
-    buttonDone.grid(row = 6, column= 0, columnspan=2, pady = 10)
+    buttonDone.grid(row = 6, column= 0, columnspan=3, pady = 10)
 
 
 def PasswordWindow(name, email, algorithm):

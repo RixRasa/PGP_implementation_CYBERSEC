@@ -12,7 +12,7 @@ class PrivateKeyRing:
         self.algorithm = algorithm
         self.EcryptedPrivateKey = privateKey
         self.publicKey = publicKey
-        self.publicKeyId = publicKey[-8:]
+        self.publicKeyId = publicKey[-33:-25] if algorithm == "Rsa" or algorithm == "Dsa" else publicKey[-41:-33]
 
     def __str__(self):
         print(self.userId + " - " + self.algorithm + " - " + self.hashedPassphrade)
@@ -32,12 +32,15 @@ class PrivateKeyRing:
 dictionaryOfPrivateKeyRings = {}
 dictionaryOfPublicKeyRings = {}
 
+
+
 class PublicKeyRing:
     def __init__(self, userId, algorithm, publicKey):
         self.userId = userId
         self.algorithm = algorithm
         self.publicKey = publicKey
-        self.publicKeyId = publicKey[-8:]
+        self.publicKeyId = publicKey[-33:-25] if algorithm == "Rsa" or algorithm == "Dsa" else publicKey[-41:-33]
+
 
     def __str__(self):
         print(self.userId + " - " + self.algorithm)
@@ -46,8 +49,9 @@ class PublicKeyRing:
 def GeneratingKey(name, email, password, algorithm):
     if(algorithm == 1):# RSA
         GenerateRsaKey(name, email, password)
-    if(algorithm == 2):# ElGamal & DSA
+    if(algorithm == 2):# DSA
         GenerateDsaKey(name, email, password)
+    if(algorithm == 3):# ElGamal
         GenerateElGamalKey(name, email, password)
 
 
@@ -65,12 +69,14 @@ def GenerateRsaKey(name, email, password):
     #Pravimo objekat
     keyRing = PrivateKeyRing(email, name , hashedPassphrase, "Rsa", publicKey, privateKey)
 
-    if not dictionaryOfPrivateKeyRings.__contains__(keyRing.userId):
-        dictionaryOfPrivateKeyRings[keyRing.userId] = []
-        dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
+    if not dictionaryOfPrivateKeyRings.__contains__(name):
+        dictionaryOfPrivateKeyRings[name] = []
+        dictionaryOfPrivateKeyRings[name].append(keyRing)
     else:
-        dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
+        dictionaryOfPrivateKeyRings[name].append(keyRing)
 
+    #helpDictionaryUserID[keyRing.userId] = keyRing
+    #helpDictionaryKeyID[keyRing.publicKeyId] = keyRing
     keyRing.__str__()
 
 
@@ -86,12 +92,14 @@ def GenerateElGamalKey(name, email, password):
     # Pravimo objekat
     keyRing = PrivateKeyRing(email, name, hashedPassphrase, "ElGamal", publicKeyExport, privateKeyExport)
 
-    if not dictionaryOfPrivateKeyRings.__contains__(keyRing.userId):
-        dictionaryOfPrivateKeyRings[keyRing.userId] = []
-        dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
+    if not dictionaryOfPrivateKeyRings.__contains__(name):
+        dictionaryOfPrivateKeyRings[name] = []
+        dictionaryOfPrivateKeyRings[name].append(keyRing)
     else:
-        dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
+        dictionaryOfPrivateKeyRings[name].append(keyRing)
 
+    #helpDictionaryUserID[keyRing.userId] = keyRing
+    #helpDictionaryKeyID[keyRing.publicKeyId] = keyRing
     keyRing.__str__()
 
 
@@ -108,12 +116,14 @@ def GenerateDsaKey(name, email, password):
     # Pravimo objekat
     keyRing = PrivateKeyRing(email, name, hashedPassphrase, "Dsa", publicKey, privateKey)
 
-    if not dictionaryOfPrivateKeyRings.__contains__(keyRing.userId):
-        dictionaryOfPrivateKeyRings[keyRing.userId] = []
-        dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
+    if not dictionaryOfPrivateKeyRings.__contains__(name):
+        dictionaryOfPrivateKeyRings[name] = []
+        dictionaryOfPrivateKeyRings[name].append(keyRing)
     else:
-        dictionaryOfPrivateKeyRings[keyRing.userId].append(keyRing)
+        dictionaryOfPrivateKeyRings[name].append(keyRing)
 
+    #helpDictionaryUserID[keyRing.userId] = keyRing
+    #helpDictionaryKeyID[keyRing.publicKeyId] = keyRing
     keyRing.__str__()
 
 
