@@ -1,8 +1,8 @@
 import datetime
 import zlib
 from Crypto.Hash import SHA1
-from Crypto.PublicKey import RSA
-from Crypto.Signature import pss
+from Crypto.PublicKey import RSA, DSA
+from Crypto.Signature import pss, DSS
 from Crypto.Cipher import CAST
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
@@ -10,7 +10,7 @@ from Crypto.Cipher import PKCS1_OAEP
 import base64
 from tkinter import *
 from KeyGenImplementation import dictionaryOfPrivateKeyRings, dictionaryOfPublicKeyRings
-
+from ElGamalImpl import PrivateKey, PublicKey, encryptElGamal, decryptElGamal
 
 ################################################# SENDING A MESSAGE ########################################################
 #Enkripcija Sesijskog kljuca
@@ -22,8 +22,10 @@ def EnctryptSestionKey(sestionKey, publicKey):
         ciphertext = cipher.encrypt(sestionKey)
         return ciphertext
     if(publicKey.algorithm == "ElGamal"):
-        print("Not Yet implemented")
+        key = PublicKey.import_key(publicKey.publicKey)
 
+        en_msg = encryptElGamal(repr(sestionKey), key)
+        return en_msg
 
 #Enkripcija Simetricnim algoritmom
 def EncryptionSymm(symmAlgoritham, fullMessage):
@@ -55,8 +57,11 @@ def Signature(privateKey, fullMessage):
         return signature
 
     if privateKey.algorithm == "Dsa":
-        print("Not Yet implemented")
-
+        hashedMessage = SHA1.new(fullMessage)
+        key = DSA.import_key(privateKey.EcryptedPrivateKey, passphrase= privateKey.hashedPassphrade)
+        signer = DSS.new(key, 'fips-186-3')
+        signature = signer.sign(hashedMessage)
+        return signature
 
 
 def SendMessage(privateKey, publicKey, senderName, receiverName,symmAlgoritham, message, signature, security, compression, conversion, fileName):
@@ -104,7 +109,9 @@ def DecryptSessionKey(privateKey, encryptSessionKey):
         sestionKey = cipher.decrypt(encryptSessionKey)
         return sestionKey
     if privateKey.algorithm == "ElGamal":
-        print("Not Implemented")
+        key = PrivateKey.import_key(privateKey.hashedPassphrade, privateKey.EcryptedPrivateKey)
+        sesionKey = decryptElGamal(encryptSessionKey, key)
+        return eval(sesionKey)
 
 
 #Dekripcija simetricnim algoritmom
@@ -128,7 +135,7 @@ def Decompression(fullMessage):
 
 #Verify potpisa
 def Verify(fullMessage, sign, publicKey):
-    
+
     if publicKey.algorithm == "Rsa":
         hashedMessage = SHA1.new(fullMessage)
         key = RSA.import_key(publicKey.publicKey)
@@ -141,8 +148,18 @@ def Verify(fullMessage, sign, publicKey):
         except (ValueError, TypeError):
             print("The signature is not authentic.")
             return 0
+
     if publicKey.algorithm == "Dsa":
-        print("Not implemented Yet")
+        hashedMessage = SHA1.new(fullMessage)
+        key = DSA.import_key(publicKey.publicKey)
+        verifier = DSS.new(key, 'fips-186-3')
+        try:
+            verifier.verify(hashedMessage, sign)
+            print("The message is authentic.")
+            return 1
+        except ValueError:
+            print("The message is not authentic.")
+            return 0
 
 def ReceiveMessage(name, fileName):
     global receiveWindow
@@ -167,7 +184,7 @@ def ReceiveMessage(name, fileName):
         for keyRing in dictionaryOfPrivateKeyRings[name]:
             if keyRing.publicKeyId == publickeyId:
                 privateKey = keyRing
-                #privateKey.__str__()
+                privateKey.__str__()
 
         sessionKey = DecryptSessionKey(privateKey, encryptSessionKey)
         fullMessage = DecryptionSymm(symmAlgoritham, cipher, iv, sessionKey)

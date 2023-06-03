@@ -147,18 +147,39 @@ def encryptElGamal(msg, publicKey):
     for i in range(0, len(en_msg)):
         en_msg[i] = s * ord(en_msg[i])
 
-    return en_msg, p
+    # Pakovanje enkriptovane poruke u bytes zajedno sa clanom 'p'
+    encryptedMsg = b''
+    for i in range(0, len(en_msg)):
+        if (i == len(en_msg) - 1):
+            encryptedMsg += str(en_msg[i]).encode('utf-8') + b'elGamalP'
+        else:
+            encryptedMsg += str(en_msg[i]).encode('utf-8') + b'elGamalM'
+
+    encryptedMsg = encryptedMsg + str(p).encode('utf-8')
+
+    return encryptedMsg
 
 
-def decryptElGamal(en_msg, p, privateKey):
-    key = privateKey.key; q = privateKey.q
+def decryptElGamal(encryptedMsg, privateKey):
+    # Otpakivanje poruke, preuzimanje enkriptovane poruke kao i parametra 'p'
+    encryptedMsg, p = encryptedMsg.split(b'elGamalP')
+
+    p = int(p.decode('utf-8'))
+
+    en_msg = encryptedMsg.split(b'elGamalM')
+    for i in range(0, len(en_msg)):
+        en_msg[i] = int(en_msg[i].decode('utf-8'))
+
+    key = privateKey.key;
+    q = privateKey.q
 
     dr_msg = []
     h = power(p, key, q)
     for i in range(0, len(en_msg)):
         dr_msg.append(chr(int(en_msg[i] / h)))
 
-    return dr_msg
+    dmsg = ''.join(dr_msg)
+    return dmsg
 
 
 # Driver code
@@ -173,6 +194,6 @@ def main():
 
 
     en_msg, p = encryptElGamal(msg, public)
-    dr_msg = decryptElGamal(en_msg, p, private)
-    dmsg = ''.join(dr_msg)
-    print("Decrypted Message :", dmsg)
+    dr_msg = decryptElGamal(en_msg,private)
+
+    print("Decrypted Message :", dr_msg)

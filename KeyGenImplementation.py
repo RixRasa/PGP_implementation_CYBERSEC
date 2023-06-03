@@ -13,6 +13,7 @@ class PrivateKeyRing:
         self.EcryptedPrivateKey = privateKey
         self.publicKey = publicKey
         self.publicKeyId = publicKey[-33:-25] if algorithm == "Rsa" or algorithm == "Dsa" else publicKey[-41:-33]
+        self.email = email
 
     def __str__(self):
         print(self.userId + " - " + self.algorithm + " - " + self.hashedPassphrade)

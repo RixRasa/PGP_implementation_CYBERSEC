@@ -132,9 +132,6 @@ def SendMessageUI(senderName, receiverName, symmAlgoritham, asymmAlgorihtm, mess
 
 
 ################################################## CHOOSE ##########################################################
-idPrivateKey = -1
-idPublicKey = -1
-fileName = "randomfile.pem"
 
 def ChooseKeys(senderName, receiverName, symmAlgoritham, asymmAlgorihtm, message, signature, security, compression, conversion):
     sendMessageOptionsWindow.destroy()
@@ -193,3 +190,7 @@ def ChoosePublic(id):
     global idPublicKey
     idPublicKey = id
     print(id)
+
+idPrivateKey = -1
+idPublicKey = -1
+fileName = "randomfile.pem"
