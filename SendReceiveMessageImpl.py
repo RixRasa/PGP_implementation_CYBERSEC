@@ -97,17 +97,19 @@ def SendMessage(privateKey, publicKey, senderName, receiverName,symmAlgoritham, 
 ################################################# RECEIVE A MESSAGE ########################################################
 #Dekripcija sesijskog kljuca
 def DecryptSessionKey(privateKey, encryptSessionKey):
+
     if privateKey.algorithm == "Rsa":
         key = RSA.import_key(privateKey.EcryptedPrivateKey, passphrase=privateKey.hashedPassphrade)
         cipher = PKCS1_OAEP.new(key)
         sestionKey = cipher.decrypt(encryptSessionKey)
         return sestionKey
     if privateKey.algorithm == "ElGamal":
-        print("Kurcina")
+        print("Not Implemented")
 
 
 #Dekripcija simetricnim algoritmom
 def DecryptionSymm(symmAlgoritham, cipher, iv ,sessionKey):
+
     if symmAlgoritham == b'1':
         decipher = AES.new(sessionKey, AES.MODE_CFB, iv=iv)
         decrypted_text = decipher.decrypt(cipher)
@@ -126,6 +128,7 @@ def Decompression(fullMessage):
 
 #Verify potpisa
 def Verify(fullMessage, sign, publicKey):
+    
     if publicKey.algorithm == "Rsa":
         hashedMessage = SHA1.new(fullMessage)
         key = RSA.import_key(publicKey.publicKey)
@@ -138,7 +141,8 @@ def Verify(fullMessage, sign, publicKey):
         except (ValueError, TypeError):
             print("The signature is not authentic.")
             return 0
-
+    if publicKey.algorithm == "Dsa":
+        print("Not implemented Yet")
 
 def ReceiveMessage(name, fileName):
     global receiveWindow
@@ -153,7 +157,7 @@ def ReceiveMessage(name, fileName):
 
     if conversion == b'1':
         fullMessage = base64.b64decode(fullMessage)
-    print(fullMessage)
+    #print(fullMessage)
 
     if security == b'1':
         publickeyId, encryptSessionKey, encryption = fullMessage.split(b'rasa21')
@@ -163,15 +167,15 @@ def ReceiveMessage(name, fileName):
         for keyRing in dictionaryOfPrivateKeyRings[name]:
             if keyRing.publicKeyId == publickeyId:
                 privateKey = keyRing
-                privateKey.__str__()
+                #privateKey.__str__()
 
         sessionKey = DecryptSessionKey(privateKey, encryptSessionKey)
         fullMessage = DecryptionSymm(symmAlgoritham, cipher, iv, sessionKey)
-    print(fullMessage)
+    #print(fullMessage)
 
     if compression == b'1':
         fullMessage = Decompression(fullMessage)
-    print(fullMessage)
+    #print(fullMessage)
 
     if signature == b'1':
         timestamp, publickeyId, octets, sign, fullMessage = fullMessage.split(b'rasa21')
@@ -183,7 +187,7 @@ def ReceiveMessage(name, fileName):
             labelVerify.grid(row=0, column=0, padx=(20, 20))
 
     filename, timestamp, message = fullMessage.split(b'BLOKICDRUGI')
-    print(message)
+    #print(message)
 
     labelMessage = Label(receiveWindow, text="Message" + message.decode('utf-8'), padx = 80, pady = 15)
     labelMessage.grid(row=1, column=0, padx=(20, 20))

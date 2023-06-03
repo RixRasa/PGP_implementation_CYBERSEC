@@ -6,6 +6,38 @@ from KeyGenImplementation import *
 
 
 
+def CredentialsForImportWindow():
+    global keyImportWindow
+    keyImportWindow = Toplevel()
+    keyImportWindow.title("Key Import Window")
+
+    labelName = Label(keyImportWindow, text="Enter name of user that is importing key: " )
+    entryName = Entry(keyImportWindow, width=100)
+
+    labelEmail = Label(keyImportWindow, text="Enter Email of user that is importing key ( Only if you are importing your private key! ): ")
+    entryEmail = Entry(keyImportWindow, width=100)
+
+    labelPassword1 = Label(keyImportWindow, text="If you are importing your private key please provide us your passphrase:")
+    labelPassword2 = Label(keyImportWindow,text="If you are importing someone else's public key you dont need to enter password:")
+    entryPassword = Entry(keyImportWindow, width=50)
+
+    labelUpload = Label(keyImportWindow, text='Import Public or Private Key')
+    buttonChoose = Button(keyImportWindow, text='Choose Key', command=lambda: open_file_import(entryName.get(), entryEmail.get(), entryPassword.get()))
+
+    #Pozicioniranje
+    labelName.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
+    entryName.grid(row=1, column=0, columnspan=3, padx=20, pady=(5,25))
+
+    labelEmail.grid(row=2, column=0, columnspan=3, padx=5, pady=5)
+    entryEmail.grid(row=3, column=0, columnspan=3, padx=20, pady=(5,25))
+
+    labelPassword1.grid(row=4, column=0, columnspan=3, padx=5, pady=5)
+    labelPassword2.grid(row=5, column=0, columnspan=3, padx=5, pady = (0,5))
+    entryPassword.grid(row=6, column=0, columnspan=3, padx=20, pady=(5,25))
+
+    labelUpload.grid(row=7, column=0, padx=20, pady=25)
+    buttonChoose.grid(row=7, column=1, padx=20, pady=25)
+
 
 def open_file_import(name, email, password):
     file_path = askopenfilename()
@@ -56,44 +88,6 @@ def open_file_import(name, email, password):
         for key in dictionaryOfPublicKeyRings:
             for value in dictionaryOfPublicKeyRings[key]:
                 print(value.__str__())
-
-
-
-
-#UI Logika
-def CredentialsForImportWindow():
-    global keyImportWindow
-    keyImportWindow = Toplevel()
-    keyImportWindow.title("Key Import Window")
-
-    labelName = Label(keyImportWindow, text="Enter name of user that is importing key: " )
-    entryName = Entry(keyImportWindow, width=100)
-
-    labelEmail = Label(keyImportWindow, text="Enter Email of user that is importing key ( Only if you are importing your private key! ): ")
-    entryEmail = Entry(keyImportWindow, width=100)
-
-    labelPassword1 = Label(keyImportWindow, text="If you are importing your private key please provide us your passphrase:")
-    labelPassword2 = Label(keyImportWindow,text="If you are importing someone else's public key you dont need to enter password:")
-    entryPassword = Entry(keyImportWindow, width=50)
-
-    labelUpload = Label(keyImportWindow, text='Import Public or Private Key')
-    buttonChoose = Button(keyImportWindow, text='Choose Key', command=lambda: open_file_import(entryName.get(), entryEmail.get(), entryPassword.get()))
-
-    #Pozicioniranje
-    labelName.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
-    entryName.grid(row=1, column=0, columnspan=3, padx=20, pady=(5,25))
-
-    labelEmail.grid(row=2, column=0, columnspan=3, padx=5, pady=5)
-    entryEmail.grid(row=3, column=0, columnspan=3, padx=20, pady=(5,25))
-
-    labelPassword1.grid(row=4, column=0, columnspan=3, padx=5, pady=5)
-    labelPassword2.grid(row=5, column=0, columnspan=3, padx=5, pady = (0,5))
-    entryPassword.grid(row=6, column=0, columnspan=3, padx=20, pady=(5,25))
-
-    labelUpload.grid(row=7, column=0, padx=20, pady=25)
-    buttonChoose.grid(row=7, column=1, padx=20, pady=25)
-
-
 
 
 

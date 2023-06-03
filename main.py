@@ -1,6 +1,6 @@
 from KeyGenUI import KeyGeneratorWindow
 from SeeAllKeysUI import *
-from KeyImportExportUI import CredentialsForImportWindow,CredentialsForExportWindow
+from KeyImportExportUIandImpl import CredentialsForImportWindow,CredentialsForExportWindow
 from SendReceiveMessageUI import SendUI,ReceiveUI
 #Funkcije buttona (Odvajacemo logiku od izgleda)
 def KeyGen():
