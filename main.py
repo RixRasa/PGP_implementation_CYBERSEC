@@ -8,7 +8,8 @@ def KeyGen():
 
 def ListKeys():
     AllKeys()
-
+def ListKeysPublic():
+    AllKeysPublic()
 def KeyImport():
     CredentialsForImportWindow()
 
@@ -32,7 +33,8 @@ main_label = Label(root, text = "Choose what do you want to do?", padx = 100 , b
 buttonKeyGen = Button(root, text = "Generate new pair of keys" , command=KeyGen)
 buttonImportKey = Button(root, text = "Import Keys" , command=KeyImport)
 buttonExportKey = Button(root, text = "Export Keys" , command=KeyExport)
-buttonListOfKeys = Button(root, text = "See all keys.", command = ListKeys)
+buttonListOfPRKeys = Button(root, text = "See all keys(private ring).", command = ListKeys)
+buttonListOfPUKeys = Button(root, text = "See all keys(public ring).", command = ListKeysPublic)
 buttonSendAMsg = Button(root, text = "Send a Message.", command = SendMsg)
 buttonReceiveAMsg = Button(root, text = "Receive a Message.", command = ReceiveMsg)
 
@@ -41,9 +43,10 @@ main_label.grid(row = 0, column = 0, pady = 10)
 buttonKeyGen.grid(row = 1, column = 0, pady = 10)
 buttonImportKey.grid(row = 2, column = 0, pady = 10)
 buttonExportKey.grid(row = 3, column = 0, pady = 10)
-buttonListOfKeys.grid(row = 4, column = 0, pady = 10)
-buttonSendAMsg.grid(row = 5, column = 0, pady = 10)
-buttonReceiveAMsg.grid(row = 6, column = 0, pady = 10)
+buttonListOfPRKeys.grid(row = 4, column = 0, pady = 10)
+buttonListOfPUKeys.grid(row = 5, column = 0, pady = 10)
+buttonSendAMsg.grid(row = 6, column = 0, pady = 10)
+buttonReceiveAMsg.grid(row = 7, column = 0, pady = 10)
 
 #Ovaj main loop je potreban kako bi konstantno mogao da se runnuje gui
 root.mainloop()
