@@ -1,5 +1,7 @@
 import datetime
 import zlib
+from tkinter.filedialog import askopenfilename
+
 from Crypto.Hash import SHA1
 from Crypto.PublicKey import RSA, DSA
 from Crypto.Signature import pss, DSS
@@ -234,8 +236,23 @@ def ReceiveMessage(name, fileName):
 
     filename, timestamp, message = fullMessage.split(b'BLOKICPrvi')
 
+    #ovde dodas button za save message i napravis funkciju gde se prosledjuje message.decode('utf-8')
+    #u toj funkciji dodaj novi prozor gde ce da te pita da izaberes txt fajl gde da se savuje poruka
+
     labelMessage = Label(receiveWindow, text="Message: " + message.decode('utf-8'), padx = 80, pady = 15)
+
+    buttonSend = Button(receiveWindow, text="Save a Message", command=lambda: ChooseWhereToSaveFile(message.decode('utf-8')))
+
     labelMessage.grid(row=1, column=0, padx=(20, 20))
+    buttonSend.grid(row=2, column=0, padx=(20, 20))
+
+def ChooseWhereToSaveFile(string):
+    global fileName
+    fileName = askopenfilename()
+
+    with open(fileName,"w") as file:
+        file.write(string)
+        file.close()
 
 
 def Greska(string):
