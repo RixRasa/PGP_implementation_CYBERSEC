@@ -21,11 +21,13 @@ def EnctryptSestionKey(sestionKey, publicKey):
         cipher = PKCS1_OAEP.new(key)
         ciphertext = cipher.encrypt(sestionKey)
         return ciphertext
+
     if(publicKey.algorithm == "ElGamal"):
         key = PublicKey.import_key(publicKey.publicKey)
 
         en_msg = encryptElGamal(repr(sestionKey), key)
         return en_msg
+
 
 #Enkripcija Simetricnim algoritmom
 def EncryptionSymm(symmAlgoritham, fullMessage):
@@ -68,21 +70,24 @@ def SendMessage(privateKey, publicKey, senderName, receiverName,symmAlgoritham, 
     timestamp = str(datetime.datetime.now()).encode('utf-8')
     fileName = fileName.encode('utf-8')
     message = message.encode('utf-8')
-    fullMessage = fileName + b'BLOKICDRUGI' + timestamp + b'BLOKICDRUGI' + message
+    fullMessage = fileName + b'BLOKICPrvi' + timestamp + b'BLOKICPrvi' + message #prvi goli oblik poruke
 
+    #Potpis
     if signature == 1:
         sign = Signature(privateKey, fullMessage)
-        fullMessage = str(datetime.datetime.now()).encode('utf-8') + b'rasa21' + privateKey.publicKeyId + b'rasa21' + sign[0:2] + b'rasa21' + sign + b'rasa21' + fullMessage
+        fullMessage = str(datetime.datetime.now()).encode('utf-8') + b'BLOKICDrugi' + privateKey.publicKeyId + b'BLOKICDrugi' + sign[0:2] + b'BLOKICDrugi' + sign + b'BLOKICDrugi' + fullMessage
 
+    #Kompresija
     if compression == 1:
         fullMessage = Compression(fullMessage)
 
+    #Enkripcija
     if security == 1:
         sesionKey, encryption = EncryptionSymm(symmAlgoritham, fullMessage)
         encryptSestionKey = EnctryptSestionKey(sesionKey, publicKey)
-        fullMessage = publicKey.publicKeyId + b'rasa21' + encryptSestionKey + b'rasa21' + encryption
+        fullMessage = publicKey.publicKeyId + b'BLOKICTreci' + encryptSestionKey + b'BLOKICTreci' + encryption# ovde se nalazi 'iv' + 'BLOKIC' + 'cipher'
 
-
+    #Konverzija
     if conversion == 1:
         fullMessage = base64.b64encode(fullMessage)
 
@@ -108,6 +113,7 @@ def DecryptSessionKey(privateKey, encryptSessionKey):
         cipher = PKCS1_OAEP.new(key)
         sestionKey = cipher.decrypt(encryptSessionKey)
         return sestionKey
+
     if privateKey.algorithm == "ElGamal":
         key = PrivateKey.import_key(privateKey.hashedPassphrade, privateKey.EcryptedPrivateKey)
         sesionKey = decryptElGamal(encryptSessionKey, key)
@@ -116,7 +122,6 @@ def DecryptSessionKey(privateKey, encryptSessionKey):
 
 #Dekripcija simetricnim algoritmom
 def DecryptionSymm(symmAlgoritham, cipher, iv ,sessionKey):
-
     if symmAlgoritham == b'1':
         decipher = AES.new(sessionKey, AES.MODE_CFB, iv=iv)
         decrypted_text = decipher.decrypt(cipher)
@@ -161,6 +166,7 @@ def Verify(fullMessage, sign, publicKey):
             print("The message is not authentic.")
             return 0
 
+
 def ReceiveMessage(name, fileName):
     global receiveWindow
     receiveWindow = Toplevel()
@@ -174,37 +180,69 @@ def ReceiveMessage(name, fileName):
 
     if conversion == b'1':
         fullMessage = base64.b64decode(fullMessage)
-    #print(fullMessage)
+
 
     if security == b'1':
-        publickeyId, encryptSessionKey, encryption = fullMessage.split(b'rasa21')
+        publickeyId, encryptSessionKey, encryption = fullMessage.split(b'BLOKICTreci')
 
         iv,cipher = encryption.split(b'BLOKIC')
 
+        privateKey = b''
         for keyRing in dictionaryOfPrivateKeyRings[name]:
             if keyRing.publicKeyId == publickeyId:
                 privateKey = keyRing
                 privateKey.__str__()
 
-        sessionKey = DecryptSessionKey(privateKey, encryptSessionKey)
-        fullMessage = DecryptionSymm(symmAlgoritham, cipher, iv, sessionKey)
-    #print(fullMessage)
+        if(privateKey == b''):
+            Greska("Private key not found")
+            return
+
+        try:
+            sessionKey = DecryptSessionKey(privateKey, encryptSessionKey)
+            fullMessage = DecryptionSymm(symmAlgoritham, cipher, iv, sessionKey)
+        except (ValueError):
+            Greska("Decryption is not successful")
+            return
+
 
     if compression == b'1':
-        fullMessage = Decompression(fullMessage)
-    #print(fullMessage)
+        try:
+            fullMessage = Decompression(fullMessage)
+        except(zlib.error):
+            Greska("Compress is not valid")
+            return
+
 
     if signature == b'1':
-        timestamp, publickeyId, octets, sign, fullMessage = fullMessage.split(b'rasa21')
+        timestamp, publickeyId, octets, sign, fullMessage = fullMessage.split(b'BLOKICDrugi')
+
+        publicKey = b''
         for keyRing in dictionaryOfPublicKeyRings[name]:
             if keyRing.publicKeyId == publickeyId:
                 publicKey = keyRing
+
+        if (publicKey == b''):
+            Greska("Public key not found")
+            return
+
         if Verify(fullMessage, sign, publicKey):
             labelVerify = Label(receiveWindow, text="The signature is authentic.", padx = 40, pady = 15)
             labelVerify.grid(row=0, column=0, padx=(20, 20))
+        else:
+            labelVerify = Label(receiveWindow, text="The signature is not - authentic.", padx=40, pady=15)
+            labelVerify.grid(row=0, column=0, padx=(20, 20))
 
-    filename, timestamp, message = fullMessage.split(b'BLOKICDRUGI')
-    #print(message)
+    filename, timestamp, message = fullMessage.split(b'BLOKICPrvi')
 
-    labelMessage = Label(receiveWindow, text="Message" + message.decode('utf-8'), padx = 80, pady = 15)
+    labelMessage = Label(receiveWindow, text="Message: " + message.decode('utf-8'), padx = 80, pady = 15)
+    labelMessage.grid(row=1, column=0, padx=(20, 20))
+
+
+def Greska(string):
+    receiveWindow.destroy()
+
+    errorWindow = Toplevel()
+    errorWindow.title("Receive message")
+
+    labelMessage = Label(errorWindow, text=string, padx=80, pady=15)
     labelMessage.grid(row=1, column=0, padx=(20, 20))

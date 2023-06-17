@@ -59,7 +59,7 @@ class PrivateKey():
         cipher = CAST.new(hashedPassphrase, CAST.MODE_OPENPGP) #Enkriptujemo privatni kljuc('stringBytes') pomocu kljuca('hashedPassphrase')
         privateKeyEncripted = cipher.encrypt(stringBytes)
 
-        stringBytesEcode64 =b'-----BEGIN ELGAMAL PRIVATE KEY-----\n' +  base64.b64encode(privateKeyEncripted) + b'\n' + b'-----END ELGAMAL PRIVATE KEY-----' #Dodajemo zaglavlje i encodujemo u 'pem'
+        stringBytesEcode64 = b'-----BEGIN ELGAMAL PRIVATE KEY-----\n' +  base64.b64encode(privateKeyEncripted) + b'\n' + b'-----END ELGAMAL PRIVATE KEY-----' #Dodajemo zaglavlje i encodujemo u 'pem'
 
         return stringBytesEcode64
 
@@ -170,7 +170,7 @@ def decryptElGamal(encryptedMsg, privateKey):
     for i in range(0, len(en_msg)):
         en_msg[i] = int(en_msg[i].decode('utf-8'))
 
-    key = privateKey.key;
+    key = privateKey.key
     q = privateKey.q
 
     dr_msg = []

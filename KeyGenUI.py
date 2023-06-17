@@ -12,7 +12,7 @@ def KeyGeneratorWindow():
     keyGeneratorInputWindow.title("Key Gen")
 
     #Generisanje widgeta
-    labelInfo = Label(keyGeneratorInputWindow, text ="Enter credentials:")
+    labelInfo = Label(keyGeneratorInputWindow, text ="Enter credentials that are needed to make the key:")
 
     labelName = Label(keyGeneratorInputWindow, text ="Enter name: ", bd = 1, relief="sunken")
     entryName = Entry(keyGeneratorInputWindow, width = 100 )

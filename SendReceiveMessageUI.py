@@ -12,7 +12,7 @@ def ReceiveUI():
     receiveWindow.title("Receive message")
 
     #Generating Wigdets
-    labelNameReceiver = Label(receiveWindow, text="Who is Receiving message:")
+    labelNameReceiver = Label(receiveWindow, text="Enter the name of user which is receiving message:")
     entryNameReceiver = Entry(receiveWindow, width=100)
 
     fileLabel = Label(receiveWindow, text="Choose file where message is:")
@@ -165,7 +165,6 @@ def ChooseKeys(senderName, receiverName, symmAlgoritham, asymmAlgorihtm, message
 
     for i, row in enumerate(table2):
         if row[1] == ("Rsa" if asymmAlgorihtm == 1 else "ElGamal"):
-            print("Ovde")
             for j, value in enumerate(row):
                 label = Label(root, text=value[0:200])
                 label.grid(row=i + len(table1), column=j, padx=10, pady=5)

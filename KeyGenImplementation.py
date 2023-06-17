@@ -5,6 +5,7 @@ from Hashing_and_Truncating import *
 from ElGamalImpl import *
 
 
+#------------------------------------------- STRUKTURE POTREBNE ZA GENERISANJE KLJUCA -------------------------------------
 class PrivateKeyRing:
     def __init__(self, email, name, password, algorithm, publicKey, privateKey):
         self.userId = email + name
@@ -13,7 +14,7 @@ class PrivateKeyRing:
         self.EcryptedPrivateKey = privateKey
         self.publicKey = publicKey
         self.publicKeyId = publicKey[-33:-25] if algorithm == "Rsa" or algorithm == "Dsa" else publicKey[-41:-33]
-        self.email = email
+
 
     def __str__(self):
         print(self.userId + " - " + self.algorithm + " - " + self.hashedPassphrade)
@@ -21,18 +22,12 @@ class PrivateKeyRing:
         print(self.EcryptedPrivateKey)
 
 
-
+    #Ovo ipak ne treba
     def export1(self, filename):
         print()
 
     def import1(self, filename):
         print()
-
-#dictionaryOfPrivateKeyRings = {"ilija@gmail.comilija":[PrivateKeyRing("ilija@gmail.com","Ilija","be77e3d34969ee11d2789f625efac759","Rsa","123","***")
-#                                       ,PrivateKeyRing("lizard123400@gmail.com","Ilija","be77e3d34969ee11d2789f625efac759","Rsa","456","***")]}
-dictionaryOfPrivateKeyRings = {}
-dictionaryOfPublicKeyRings = {}
-
 
 
 class PublicKeyRing:
@@ -47,6 +42,12 @@ class PublicKeyRing:
         print(self.userId + " - " + self.algorithm)
         print(self.publicKey)
 
+
+dictionaryOfPrivateKeyRings = {}
+dictionaryOfPublicKeyRings = {}
+
+
+#------------------------------------------- POTREBNE FUNKCIJE ZA GENERISANJE KLJUCA --------------------------------------
 def GeneratingKey(name, email, password, algorithm):
     if(algorithm == 1):# RSA
         GenerateRsaKey(name, email, password)

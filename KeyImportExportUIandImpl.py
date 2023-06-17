@@ -100,15 +100,13 @@ def CredentialsForExportWindow():
     credentialsForExportWindow.resizable(False,False)
 
     # Generisanje widgeta
-    labelInfo = Label(credentialsForExportWindow, text="Enter credentials")
 
-    labelName = Label(credentialsForExportWindow, text="Enter name: ", relief="sunken")
+    labelName = Label(credentialsForExportWindow, text="Enter name of user that is exporting key: ")
     entryName = Entry(credentialsForExportWindow, width=100)
 
     buttonDone = Button(credentialsForExportWindow, text="Export", command=lambda: ExportKeysWindow(entryName.get()))
 
     # Pozicioniranje
-    labelInfo.grid(row=0, column=0, columnspan=2, pady=10)
 
     labelName.grid(row=1, column=0, columnspan=2, pady=3)
     entryName.grid(row=2, column=0, columnspan=2, pady=10)
@@ -138,7 +136,7 @@ def ExportKeysWindow(name):
         first_button.grid(row=i, column=len(row), padx=5)
 
         second_button = Button(root, text="Export public key", command=lambda id = i: open_file_export(id, b'public'))
-        second_button.grid(row=i, column=len(row) + 1)
+        second_button.grid(row=i, column=len(row) + 1, padx=5)
 
     # Start the main event loop
 

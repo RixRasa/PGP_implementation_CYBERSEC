@@ -1,15 +1,19 @@
 from KeyGenUI import KeyGeneratorWindow
-from SeeAllKeysUI import *
+from SeeAllKeysPrivate import AllKeysPrivate
+from SeeAllKeysPublic import AllKeysPublic
 from KeyImportExportUIandImpl import CredentialsForImportWindow,CredentialsForExportWindow
 from SendReceiveMessageUI import SendUI,ReceiveUI
+from tkinter import *
 #Funkcije buttona (Odvajacemo logiku od izgleda)
 def KeyGen():
     KeyGeneratorWindow()
 
 def ListKeys():
-    AllKeys()
+    AllKeysPrivate()
+
 def ListKeysPublic():
     AllKeysPublic()
+
 def KeyImport():
     CredentialsForImportWindow()
 
