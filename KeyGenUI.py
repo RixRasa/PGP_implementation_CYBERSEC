@@ -25,6 +25,10 @@ def KeyGeneratorWindow():
     chooseAlgorithhmDsa = Radiobutton(keyGeneratorInputWindow, text="DSA", variable=r, value=2)
     chooseAlgorithhmElGamal = Radiobutton(keyGeneratorInputWindow, text="ElGamal", variable=r, value=3)
 
+    r1 = IntVar()
+    chooseSizeRsa = Radiobutton(keyGeneratorInputWindow, text="1024", variable=r1, value=1)
+    chooseSizeDsa = Radiobutton(keyGeneratorInputWindow, text="2048", variable=r1, value=2)
+
     buttonDone = Button(keyGeneratorInputWindow, text ="Generate", command = lambda: PasswordWindow(entryName.get(), entryEmail.get(), r.get()))
 
 
@@ -41,7 +45,10 @@ def KeyGeneratorWindow():
     chooseAlgorithhmDsa.grid(row = 5, column= 1, pady = 10)
     chooseAlgorithhmElGamal.grid(row = 5, column= 2, pady = 10)
 
-    buttonDone.grid(row = 6, column= 0, columnspan=3, pady = 10)
+    chooseSizeRsa.grid(row = 6, column= 2, pady = 10)
+    chooseSizeDsa.grid(row = 7, column= 2, pady = 10)
+
+    buttonDone.grid(row = 8, column= 0, columnspan=3, pady = 10)
 
 
 def PasswordWindow(name, email, algorithm):

@@ -13,6 +13,7 @@ import base64
 from tkinter import *
 from KeyGenImplementation import dictionaryOfPrivateKeyRings, dictionaryOfPublicKeyRings
 from ElGamalImpl import PrivateKey, PublicKey, encryptElGamal, decryptElGamal
+from Hashing_and_Truncating import sha1_hash
 
 ################################################# SENDING A MESSAGE ########################################################
 #Enkripcija Sesijskog kljuca
@@ -169,7 +170,7 @@ def Verify(fullMessage, sign, publicKey):
             return 0
 
 
-def ReceiveMessage(name, fileName):
+def ReceiveMessage(name, fileName, password):
     global receiveWindow
     receiveWindow = Toplevel()
     receiveWindow.title("Receive message")
@@ -193,6 +194,10 @@ def ReceiveMessage(name, fileName):
         for keyRing in dictionaryOfPrivateKeyRings[name]:
             if keyRing.publicKeyId == publickeyId:
                 privateKey = keyRing
+                hashedPassphrase = sha1_hash(password)
+                if(hashedPassphrase != privateKey.hashedPassphrade):
+                    print("Bas password")
+                    return
                 privateKey.__str__()
 
         if(privateKey == b''):

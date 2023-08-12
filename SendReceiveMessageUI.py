@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter.filedialog import askopenfilename
 from SendReceiveMessageImpl import SendMessage,ReceiveMessage
 from KeyGenImplementation import dictionaryOfPrivateKeyRings, dictionaryOfPublicKeyRings
+from Hashing_and_Truncating import *
 
 
 
@@ -15,23 +16,35 @@ def ReceiveUI():
     labelNameReceiver = Label(receiveWindow, text="Enter the name of user which is receiving message:")
     entryNameReceiver = Entry(receiveWindow, width=100)
 
+    labelemailReceiver = Label(receiveWindow, text="Enter the email of user which is receiving message:")
+    entryemailReceiver = Entry(receiveWindow, width=100)
+
+    labelpasswordReceiver = Label(receiveWindow, text="Enter the password of key:")
+    entrypasswordReceiver = Entry(receiveWindow, width=100)
+
     fileLabel = Label(receiveWindow, text="Choose file where message is:")
     fileButton = Button(receiveWindow, text="ChooseLocation", command=lambda: ChooseFile())
 
-    receiveButton = Button(receiveWindow, text="Receive", command=lambda: ReceiveMessageUI(entryNameReceiver.get(), fileName))
+    receiveButton = Button(receiveWindow, text="Receive", command=lambda: ReceiveMessageUI(entryNameReceiver.get(), fileName, entrypasswordReceiver.get()))
 
     #Positioning
     labelNameReceiver.grid(row=1, column=0, columnspan=4, pady=3)
     entryNameReceiver.grid(row=2, column=0, columnspan=4, pady=10)
 
-    fileLabel.grid(row=3, column=0, columnspan=4, pady=3)
-    fileButton.grid(row=4, column=0, columnspan=4, pady=3)
+    labelemailReceiver.grid(row=3, column=0, columnspan=4, pady=3)
+    entryemailReceiver.grid(row=4, column=0, columnspan=4, pady=3)
 
-    receiveButton.grid(row=5, column=0, columnspan=4, pady=3)
+    labelpasswordReceiver.grid(row=5, column=0, columnspan=4, pady=3)
+    entrypasswordReceiver.grid(row=6, column=0, columnspan=4, pady=3)
+
+    fileLabel.grid(row=7, column=0, columnspan=4, pady=3)
+    fileButton.grid(row=8, column=0, columnspan=4, pady=3)
+
+    receiveButton.grid(row=9, column=0, columnspan=4, pady=3)
 
 
-def ReceiveMessageUI(name, filename):
-    ReceiveMessage(name, filename)
+def ReceiveMessageUI(name, filename, password):
+    ReceiveMessage(name, filename, password)
 
 
 ################################################## SEND - UI ##########################################################
@@ -68,6 +81,8 @@ def SendUI():
     labelNameReceiver = Label(sendMessageOptionsWindow, text="Enter name of sender: ", relief="sunken")
     entryNameReceiver = Entry(sendMessageOptionsWindow, width=100)
 
+    labelemailReceiver = Label(sendMessageOptionsWindow, text="Enter email of sender: ", relief="sunken")
+    entryemailReceiver = Entry(sendMessageOptionsWindow, width=100)
 
     #Generating Widgets for Options
     labelInfoOptions = Label(sendMessageOptionsWindow, text="Check services you want to use:")
@@ -111,24 +126,31 @@ def SendUI():
     labelNameReceiver.grid(row=10, column=0, columnspan=4, pady=3)
     entryNameReceiver.grid(row=11, column=0, columnspan=4, pady=10)
 
-    labelInfoOptions.grid(row = 12, column=0, columnspan=4, pady = (20,3))
-    securityCheck.grid(row = 13 , column=0,pady = (3,20))
-    signatureCheck.grid(row=13, column=1,pady = (3,20))
-    compressionCheck.grid(row=13, column=2,pady = (3,20))
-    conversionCheck.grid(row=13, column=3,pady = (3,20))
+    labelemailReceiver.grid(row=12, column=0, columnspan=4, pady=3)
+    entryemailReceiver.grid(row=13, column=0, columnspan=4, pady=10)
+
+    labelInfoOptions.grid(row = 14, column=0, columnspan=4, pady = (20,3))
+    securityCheck.grid(row = 15 , column=0,pady = (3,20))
+    signatureCheck.grid(row=15, column=1,pady = (3,20))
+    compressionCheck.grid(row=15, column=2,pady = (3,20))
+    conversionCheck.grid(row=15, column=3,pady = (3,20))
 
 
-    buttonDone.grid(row = 14, columnspan=4, pady = 40)
+    buttonDone.grid(row = 16, columnspan=4, pady = 40)
 
 
 def SendMessageUI(senderName, receiverName, symmAlgoritham, asymmAlgorihtm, message, signature, security, compression,
-                  conversion):
+                  conversion, password):
+    root.destroy()
+    hashedPassphrase = sha1_hash(password)
     privateKey = keysPrivateRing[idPrivateKey]
     publicKey = keysPublicRing[idPublicKey]
 
-    SendMessage(privateKey, publicKey, senderName, receiverName, symmAlgoritham, message, signature, security,
+    if(hashedPassphrase == privateKey.hashedPassphrade):
+        SendMessage(privateKey, publicKey, senderName, receiverName, symmAlgoritham, message, signature, security,
                 compression, conversion, fileName)
-
+    else:
+        SendUI()
 
 
 ################################################## CHOOSE ##########################################################
@@ -172,9 +194,13 @@ def ChooseKeys(senderName, receiverName, symmAlgoritham, asymmAlgorihtm, message
             first_button = Button(root, text="Choose this public key", command= lambda id = i : ChoosePublic(id))
             first_button.grid(row=i + len(table1), column=len(row), padx=5)
 
+    labelNamePassword = Label(root, text="Enter password for private key: ", relief="sunken")
+    labelNamePassword.grid(row = len(table1) + len(table2) + 1, column = 0, columnspan= 3)
+    entrypassword = Entry(root, width=100)
+    entrypassword.grid(row = len(table1) + len(table2) + 2, column = 0, columnspan= 3)
 
-    buttonSend = Button(root, text = "Send", command = lambda : SendMessageUI(senderName, receiverName, symmAlgoritham, asymmAlgorihtm, message, signature, security, compression, conversion))
-    buttonSend.grid(row = len(table1) + len(table2) + 1, column = 0, columnspan= 3, pady = (20,20))
+    buttonSend = Button(root, text = "Send", command = lambda : SendMessageUI(senderName, receiverName, symmAlgoritham, asymmAlgorihtm, message, signature, security, compression, conversion, entrypassword.get()))
+    buttonSend.grid(row = len(table1) + len(table2) + 3, column = 0, columnspan= 3, pady = (20,20))
 
 def ChooseFile():
     global fileName
